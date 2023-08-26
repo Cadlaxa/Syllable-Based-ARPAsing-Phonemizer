@@ -14,7 +14,7 @@ This Phonemizer was optimizer for **`Arpasing 0.1.0`** and **`Arpasing 0.2.0`** 
  - - - -
 ## How to download and install the custom Phonemizer
 
-- To download and install the Phonemizer, click on Tags then download the zip file. When downloaded, move ArpaPlusPhonemizer.dll into the path\to\OpenUtau\Plugins folder or just simply drag the dll file and drop onto the OpenUtau program.
+- To download and install the Phonemizer, click on Releases then click the dll file to download. When downloaded, move ArpaPlusPhonemizer.dll into the path\to\OpenUtau\Plugins folder or just simply drag the dll file and drop onto the OpenUtau program.
  - - - -
  ## Mechanics of the Phonemizer
 
