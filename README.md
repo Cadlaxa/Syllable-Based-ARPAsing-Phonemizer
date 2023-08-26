@@ -19,31 +19,32 @@ This Phonemizer was optimizer for `Arpasing 0.1.0` and `Arpasing 0.2.0` **banks 
  ## Mechanics of the Phonemizer
 
 ### How syllables work
-**Syllables are built like:**
+- **Syllables are built like:**
 
-- Starting C: `[- c]`
-- Starting V: `[- v]`
-- VV: `(with V and CV fallbacks if there's so VV available on the bank)`
-- Connecting CV: `[c v]`
-- Connecting VC: `[v c]`
-- Connecting CC: `[c c]` (with consonant fallbacks)
-- Ending C: `[c -]`
-- Ending V: `[v -]`
+  - Starting C: `[- c]`
+  - Starting V: `[- v]`
+  - VV: `(with V and CV fallbacks if there's so VV available on the bank)`
+  - Connecting CV: `[c v]`
+  - Connecting VC: `[v c]`
+  - Connecting CC: `[c c]` (with consonant fallbacks)
+  - Ending C: `[c -]`
+  - Ending V: `[v -]`
 
-  **Phoneme length are specified directly to the phonemizer:**
-- Default transition in ms: '0.50'
-- Vowels: 'default'
-- Consonants: '1.3'
-- Affricates: '1.5'
-- Long Consonants: '2.3'
-- Semi-long Consonants: '1.3'
-- Tap Consonant: '0.5'
+- **Phoneme length are specified directly to the phonemizer:**
+  - Default transition in ms: '0.50'
+  - Vowels: 'default'
+  - Consonants: '1.3'
+  - Affricates: '1.5'
+  - Long Consonants: '2.3'
+  - Semi-long Consonants: '1.3'
+  - Tap Consonant: '0.5'
  - - - -
 ### Vowel and Consonant Fallbacks
-**This custom Phonemizer supports vowel and consonant fallbacks:**
-- CV Fallback: `[c v]`
-- VV Fallback: `(with V and CV fallbacks if there's so VV available on the bank)`
-- Connecting VC Fallback: `[v c]`
+- **This custom Phonemizer supports vowel and consonant fallbacks:**
+  - CV Fallback: `[c v]`
+  - VV Fallback: `(with V and CV fallbacks if there's so VV available on the bank)`
+  - Connecting VC Fallback: `[v c]`
+ - - - -
 ### Phonemizer Demo
 - **English**
   - Vocal: KYE by @Winter_drivE
