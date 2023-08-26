@@ -48,14 +48,26 @@ This Phonemizer was optimizer for **`Arpasing 0.1.0`** and **`Arpasing 0.2.0`** 
 ### Phonemizer Demo
 - **English**
   - Vocal: KYE by @Winter_drivE
-  - `EN ARPA`: https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/assets/92255161/7feb5dc9-06cd-4756-aa41-bb3a304ec06c
-  - `EN ARPA+`: https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/assets/92255161/b82f3906-da8b-401c-9e37-9a6229d80541
+  - `EN ARPA`:
+    
+    https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/assets/92255161/7feb5dc9-06cd-4756-aa41-bb3a304ec06c
+  - `EN ARPA+`:
+    
+    https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/assets/92255161/b82f3906-da8b-401c-9e37-9a6229d80541
 - **Chinese (with dictionary)**
   - Vocal: LIEE ENGLISH by @utauraptor
-  - `EN ARPA`: https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/assets/92255161/e1dd8dcf-f79a-4f79-aef5-355f51bf953a
-  - `EN ARPA+`: https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/assets/92255161/93bb4429-3aaf-4e5f-b553-55403cb5257b
+  - `EN ARPA`:
+    
+    https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/assets/92255161/e1dd8dcf-f79a-4f79-aef5-355f51bf953a
+  - `EN ARPA+`:
+    
+    https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/assets/92255161/93bb4429-3aaf-4e5f-b553-55403cb5257b
 - **Japanese (with dictionary)**
   - Vocal: Ryujin Soru by @Sora/Rippa
-  - `EN ARPA`: https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/assets/92255161/65842485-3487-49ec-8391-d0a67504a4a5
-  - `EN ARPA+`: https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/assets/92255161/8b8ebc7f-3e5e-488d-a1bd-cba27ce3b8b6
+  - `EN ARPA`:
+    
+    https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/assets/92255161/65842485-3487-49ec-8391-d0a67504a4a5
+  - `EN ARPA+`:
+    
+    https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/assets/92255161/8b8ebc7f-3e5e-488d-a1bd-cba27ce3b8b6
 
