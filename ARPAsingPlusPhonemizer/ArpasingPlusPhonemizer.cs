@@ -15,8 +15,9 @@ namespace OpenUtau.Plugin.Builtin {
         private readonly string[] consonants = "b,ch,d,dh,dr,dx,f,g,hh,jh,k,l,m,n,ng,p,q,r,s,sh,t,th,tr,v,w,y,z,zh".Split(',');
         private readonly string[] affricates = "ch,jh,j".Split(',');
         private readonly string[] tapConsonant = "dx".Split(",");
-        private readonly string[] semilongConsonants = "l,r,y,w,ng,n,m,v,z".Split(",");
-        private readonly string[] longConsonants = "ch,f,jh,s,sh,th,zh,dr,tr,ts,hh,j,q".Split(",");
+        private readonly string[] semilongConsonants = "l,r,y,w,ng,n,m,v,z,q,hh".Split(",");
+        private readonly string[] endingGlides = "l,r".Split(",");
+        private readonly string[] longConsonants = "ch,f,jh,s,sh,th,zh,dr,tr,ts,j".Split(",");
         private readonly string[] normalConsonants = "b,d,dh,g,k,p,t".Split(',');
         private readonly Dictionary<string, string> dictionaryReplacements = ("aa=aa;ae=ae;ah=ah;ao=ao;aw=aw;ah0=ax;ay=ay;" +
             "b=b;ch=ch;d=d;dh=dh;" + "dx=dx;eh=eh;er=er;ey=ey;f=f;g=g;hh=hh;ih=ih;iy=iy;jh=jh;k=k;l=l;m=m;n=n;ng=ng;ow=ow;oy=oy;" +
@@ -38,7 +39,7 @@ namespace OpenUtau.Plugin.Builtin {
                 .ToDictionary(parts => parts[0], parts => parts[1]);
 
         private bool isMissingPhonemes = false;
-       
+
         protected override IG2p LoadBaseDictionary() {
             var g2ps = new List<IG2p>();
 
@@ -104,7 +105,7 @@ namespace OpenUtau.Plugin.Builtin {
                 } else {
                     // previous alias will be extended
                     basePhoneme = null;
-                } 
+                }
             } else { // VCV (for funssies and experimental)
                 var vcv = $"{prevV} {cc[0]}{v}";
                 var vccv = $"{prevV} {string.Join("", cc)}{v}";
@@ -143,7 +144,7 @@ namespace OpenUtau.Plugin.Builtin {
             if (ending.IsEndingV) {
                 TryAddPhoneme(phonemes, ending.tone, vr);
             }
-                return phonemes;
+            return phonemes;
         }
 
         protected override string ValidateAlias(string alias) {
@@ -158,8 +159,8 @@ namespace OpenUtau.Plugin.Builtin {
 
             //CV (bloat ik, I have to simplify this soon)
             Dictionary<string, List<string>> vowelReplacements = new Dictionary<string, List<string>> {
-            
-            
+
+
             { "dr ax", new List<string> { "jh ah" } },
             { "tr ax", new List<string> { "ch ah" } },
             { "zh ax", new List<string> { "jh ah" } },
@@ -261,7 +262,7 @@ namespace OpenUtau.Plugin.Builtin {
             { "v uw", new List<string> { "b uw" } },
             { "z uw", new List<string> { "s uw" } },
             { "zh uw", new List<string> { "sh uw" } },
-            
+
             };
 
 
@@ -278,7 +279,7 @@ namespace OpenUtau.Plugin.Builtin {
                 }
             }
 
-            
+
             Dictionary<string, List<string>> vvReplacements = new Dictionary<string, List<string>>
 {
             //VV (diphthongs)
@@ -446,7 +447,7 @@ namespace OpenUtau.Plugin.Builtin {
                 }
             }
             foreach (var V in new[] { " oy" }) {
-                alias = alias.Replace( " oy", " ow" );
+                alias = alias.Replace(" oy", " ow");
             }
 
             //CV (dx, dr, tr, zh)
@@ -2098,12 +2099,12 @@ namespace OpenUtau.Plugin.Builtin {
             } else {
                 return base.ValidateAlias(alias);
             }
-         }
+        }
         protected override double GetTransitionBasicLengthMs(string alias = "") {
             double transitionMultiplier = 0.5; // Default multiplier
 
             foreach (var c in longConsonants) {
-                if (alias.Contains(c) && !alias.StartsWith(c)) {
+                if (alias.Contains(c) && !alias.StartsWith(c) && !alias.Contains("ng -")) {
                     return base.GetTransitionBasicLengthMs() * 2.3;
                 }
             }
@@ -2128,9 +2129,21 @@ namespace OpenUtau.Plugin.Builtin {
                 }
             }
 
-            foreach (var c in semilongConsonants) {
+            foreach (var c in endingGlides) {
                 if (alias.Contains(c) && !alias.StartsWith(c)) {
-                    return base.GetTransitionBasicLengthMs() * 1.3;
+                    foreach (var vowel in "aa,ax,ae,ah,ao,aw,ay,eh,er,ey,ih,iy,ow,oy,uh,uw".Split(",")) {
+                        if (alias.Contains($"{vowel} {c}")){
+                            return base.GetTransitionBasicLengthMs() * 2.5;
+                        }
+                    }
+                }
+            }
+                
+            foreach (var c in semilongConsonants) {
+                if (alias.Contains(c) && !alias.StartsWith(c) && !alias.Contains("ay -") && !alias.Contains("ey -") && !alias.Contains("oy -")
+                     && !alias.Contains("iy -") && !alias.Contains("aw -") && !alias.Contains("ow -") && !alias.Contains("er -")
+                     && !alias.Contains($"{c} -") && !alias.Contains("ng -")) {
+                    return base.GetTransitionBasicLengthMs() * 1.75;
                 }
             }
 
