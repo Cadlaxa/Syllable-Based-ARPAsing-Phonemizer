@@ -103,28 +103,37 @@ namespace OpenUtau.Plugin.Builtin {
                         basePhoneme = v;
                     }
                 } else {
-                    // previous alias will be extended
+                    // the previous alias will be extended
                     basePhoneme = null;
                 }
+
             } else { // VCV (for funssies and experimental)
                 var vcv = $"{prevV} {cc[0]}{v}";
                 var vccv = $"{prevV} {string.Join("", cc)}{v}";
                 var crv = $"{cc.Last()} {v}";
+
+                // Handle VCV and VCCV cases
                 if (syllable.IsVCVWithOneConsonant && (HasOto(vcv, syllable.vowelTone) || HasOto(ValidateAlias(vcv), syllable.vowelTone))) {
                     basePhoneme = vcv;
                 } else if (syllable.IsVCVWithMoreThanOneConsonant && (HasOto(vccv, syllable.vowelTone) || HasOto(ValidateAlias(vccv), syllable.vowelTone))) {
                     basePhoneme = vccv;
                 } else {
                     basePhoneme = cc.Last() + v;
+
+                    // Check additional conditions for choosing base phoneme
+                    // ...
+
                     if (!HasOto(cc.Last() + v, syllable.vowelTone) && (HasOto(crv, syllable.vowelTone) || HasOto(ValidateAlias(crv), syllable.vowelTone))) {
                         basePhoneme = crv;
                     }
+
                 }
             }
 
             phonemes.Add(basePhoneme);
             return phonemes;
         }
+
 
 
         protected override List<string> ProcessEnding(Ending ending) {
@@ -262,6 +271,7 @@ namespace OpenUtau.Plugin.Builtin {
             { "v uw", new List<string> { "b uw" } },
             { "z uw", new List<string> { "s uw" } },
             { "zh uw", new List<string> { "sh uw" } },
+            { "q ay", new List<string> { "q ah" } },
 
             };
 
@@ -2101,16 +2111,18 @@ namespace OpenUtau.Plugin.Builtin {
             }
         }
         protected override double GetTransitionBasicLengthMs(string alias = "") {
-            double transitionMultiplier = 0.5; // Default multiplier
-
+            double transitionMultiplier = 1.0; // Default multiplier
+            bool isEndingConsonant = false;
+            bool isEndingVowel = false;
+            bool hasL = false;
+            bool hasR = false;
+            bool hasSuffix = false;
+            
             foreach (var c in longConsonants) {
                 if (alias.Contains(c) && !alias.StartsWith(c) && !alias.Contains("ng -")) {
                     return base.GetTransitionBasicLengthMs() * 2.3;
                 }
             }
-
-            bool hasL = false;
-            bool hasR = false;
 
             foreach (var c in normalConsonants) {
                 if (alias.Contains(c) && !alias.StartsWith(c) && !alias.Contains("dx")) {
@@ -2126,9 +2138,14 @@ namespace OpenUtau.Plugin.Builtin {
 
             foreach (var c in tapConsonant) {
                 Console.WriteLine($"c: {c}, alias: {alias}");
-                if (alias.Contains(c) && alias.Contains("dx") && !alias.Contains("d") && !alias.Contains("dh")) {
-                    double transitionLengthFactor = alias.Contains("dx") ? 0.50 : 0.30;
-                    return base.GetTransitionBasicLengthMs() * transitionLengthFactor;
+                bool shouldTap = alias.Contains(c) || alias.Contains("dx") || alias.EndsWith("dx")
+                                    && !alias.Contains('d') && !alias.Contains("dh") && alias.Contains($"{c} dx");
+                if (shouldTap) {
+                    foreach (var v in vowels) {
+                        if (alias.Contains($"{v} dx")) {
+                            return base.GetTransitionBasicLengthMs() * 0.5;
+                        }
+                    }
                 }
             }
 
@@ -2147,6 +2164,11 @@ namespace OpenUtau.Plugin.Builtin {
                     }
                 }
             }
+            if (hasL) {
+                return base.GetTransitionBasicLengthMs() * 1.3; // Value for 'l'
+            } else if (hasR) {
+                return base.GetTransitionBasicLengthMs() * 1.4; // Value for 'r'
+            }
 
             foreach (var c in semilongConsonants) {
                 if (alias.Contains(c) && !alias.StartsWith(c) && !alias.Contains("ay -") && !alias.Contains("ey -") && !alias.Contains("oy -")
@@ -2155,11 +2177,43 @@ namespace OpenUtau.Plugin.Builtin {
                     return base.GetTransitionBasicLengthMs() * 1.75;
                 }
             }
-            if (hasL) {
-                return base.GetTransitionBasicLengthMs() * 1.3; // Value for 'l'
-            } else if (hasR) {
-                return base.GetTransitionBasicLengthMs() * 1.4; // Value for 'r'
+
+            // Check if the alias ends with a consonant or vowel
+            foreach (var c in consonants) {
+                if (alias.Contains(c) && alias.Contains('-') && alias.StartsWith(c) || alias.Contains($"{c} - {AreTonesFromTheSameSubbank}")) {
+                    isEndingConsonant = true;
+                    break;
+                }
             }
+
+            foreach (var v in vowels) {
+                if (alias.Contains(v) && alias.Contains('-') && alias.StartsWith(v) || alias.Contains($"{v} - {AreTonesFromTheSameSubbank}")) {
+                    isEndingVowel = true;
+                    break;
+                }
+            }
+
+            // Check for tone suffix
+            foreach (var tone in vowels) {
+                if (alias.EndsWith(tone)) {
+                    hasSuffix = true;
+
+                    break;
+                }
+            }
+            foreach (var tone in consonants) {
+                if (alias.EndsWith(tone)) {
+                    hasSuffix = true;
+
+                    break;
+                }
+            }
+            // If the alias ends with a consonant or vowel, return 0.5 ms
+            if (isEndingConsonant || isEndingVowel || hasSuffix) {
+                return base.GetTransitionBasicLengthMs() * 0.5;
+            }
+
+            
             return base.GetTransitionBasicLengthMs() * transitionMultiplier;
         }
     }
