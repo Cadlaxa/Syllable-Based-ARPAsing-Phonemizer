@@ -15,10 +15,10 @@ namespace OpenUtau.Plugin.Builtin {
         private readonly string[] consonants = "b,ch,d,dh,dr,dx,f,g,hh,jh,k,l,m,n,ng,p,q,r,s,sh,t,th,tr,v,w,y,z,zh".Split(',');
         private readonly string[] affricates = "ch,jh,j".Split(',');
         private readonly string[] tapConsonant = "dx".Split(",");
-        private readonly string[] semilongConsonants = "l,r,y,w,ng,n,m,v,z,q,hh".Split(",");
+        private readonly string[] semilongConsonants = "y,w,ng,n,m,v,z,q,hh".Split(",");
         private readonly string[] endingGlides = "l,r".Split(",");
         private readonly string[] longConsonants = "ch,f,jh,s,sh,th,zh,dr,tr,ts,j".Split(",");
-        private readonly string[] normalConsonants = "b,d,dh,g,k,p,t".Split(',');
+        private readonly string[] normalConsonants = "b,d,dh,g,k,p,t,l,r".Split(',');
         private readonly Dictionary<string, string> dictionaryReplacements = ("aa=aa;ae=ae;ah=ah;ao=ao;aw=aw;ah0=ax;ay=ay;" +
             "b=b;ch=ch;d=d;dh=dh;" + "dx=dx;eh=eh;er=er;ey=ey;f=f;g=g;hh=hh;ih=ih;iy=iy;jh=jh;k=k;l=l;m=m;n=n;ng=ng;ow=ow;oy=oy;" +
             "p=p;q=q;r=r;s=s;sh=sh;t=t;th=th;" + "uh=uh;uw=uw;v=v;w=w;" + "y=y;z=z;zh=zh").Split(';')
@@ -2109,9 +2109,18 @@ namespace OpenUtau.Plugin.Builtin {
                 }
             }
 
+            bool hasL = false;
+            bool hasR = false;
+
             foreach (var c in normalConsonants) {
                 if (alias.Contains(c) && !alias.StartsWith(c) && !alias.Contains("dx")) {
-                    return base.GetTransitionBasicLengthMs() * 1.3;
+                    if (c == "l") {
+                        hasL = true;
+                    } else if (c == "r") {
+                        hasR = true;
+                    } else {
+                        return base.GetTransitionBasicLengthMs() * 1.3;
+                    }
                 }
             }
 
@@ -2132,13 +2141,13 @@ namespace OpenUtau.Plugin.Builtin {
             foreach (var c in endingGlides) {
                 if (alias.Contains(c) && !alias.StartsWith(c)) {
                     foreach (var vowel in "aa,ax,ae,ah,ao,aw,ay,eh,er,ey,ih,iy,ow,oy,uh,uw".Split(",")) {
-                        if (alias.Contains($"{vowel} {c}")){
+                        if (alias.Contains($"{vowel} {c}")) {
                             return base.GetTransitionBasicLengthMs() * 2.5;
                         }
                     }
                 }
             }
-                
+
             foreach (var c in semilongConsonants) {
                 if (alias.Contains(c) && !alias.StartsWith(c) && !alias.Contains("ay -") && !alias.Contains("ey -") && !alias.Contains("oy -")
                      && !alias.Contains("iy -") && !alias.Contains("aw -") && !alias.Contains("ow -") && !alias.Contains("er -")
@@ -2146,7 +2155,11 @@ namespace OpenUtau.Plugin.Builtin {
                     return base.GetTransitionBasicLengthMs() * 1.75;
                 }
             }
-
+            if (hasL) {
+                return base.GetTransitionBasicLengthMs() * 1.3; // Value for 'l'
+            } else if (hasR) {
+                return base.GetTransitionBasicLengthMs() * 1.4; // Value for 'r'
+            }
             return base.GetTransitionBasicLengthMs() * transitionMultiplier;
         }
     }
