@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using OpenUtau.Api;
 using OpenUtau.Classic;
 using OpenUtau.Core.G2p;
@@ -11,12 +12,19 @@ namespace OpenUtau.Plugin.Builtin {
     [Phonemizer("Arpasing+ Phonemizer", "EN ARPA+", "Cadlaxa", language: "EN")]
     public class ArpasingPlusPhonemizer : SyllableBasedPhonemizer {
         protected IG2p g2p;
-        private readonly string[] vowels = "aa,ax,ae,ah,ao,aw,ay,eh,er,ey,ih,iy,ow,oy,uh,uw,a,e,i,o,u".Split(',');
+        private readonly string[] vowels = {
+        "aa", "ax", "ae", "ah", "ao", "aw", "ay", "eh", "er", "ey", "ih", "iy", "ow", "oy", "uh", "uw", "a", "e", "i", "o", "u",
+        "aar", "ar", "axr", "aer", "ahr", "aor", "or", "awr", "aur", "ayr", "air", "ehr", "eyr", "eir", "ihr", "iyr", "ir", "owr", "our", "oyr", "oir", "uhr", "uwr", "ur",
+        "aal", "al", "axl", "ael", "ahl", "aol", "ol", "awl", "aul", "ayl", "ail", "ehl", "el", "eyl", "eil", "ihl", "iyl", "il", "owl", "oul", "oyl", "oil", "uhl", "uwl", "ul",
+        "naan", "an", "axn", "aen", "ahn", "aon", "on", "awn", "aun", "ayn", "ain", "ehn", "en", "eyn", "ein", "ihn", "iyn", "in", "own", "oun", "oyn", "oin", "uhn", "uwn", "un",
+        "aang", "ang", "axng", "aeng", "ahng", "aong", "ong", "awng", "aung", "ayng", "aing", "ehng", "eng", "eyng", "eing", "ihng", "iyng", "ing", "owng", "oung", "oyng", "oing", "uhng", "uwng", "ung",
+        "aam", "am", "axm", "aem", "ahm", "aom", "om", "awm", "aum", "aym", "aim", "ehm", "em", "eym", "eim", "ihm", "iym", "im", "owm", "oum", "oym", "oim", "uhm", "uwm", "um"
+        };
         private readonly string[] consonants = "b,ch,d,dh,dr,dx,f,g,hh,jh,k,l,m,n,ng,p,q,r,s,sh,t,th,tr,v,w,y,z,zh".Split(',');
         private readonly string[] affricates = "ch,jh,j".Split(',');
         private readonly string[] tapConsonant = "dx".Split(",");
         private readonly string[] semilongConsonants = "y,w,ng,n,m,v,z,q,hh".Split(",");
-        private readonly string[] endingGlides = "l,r".Split(",");
+        private readonly string[] connectingGlides = "l,r".Split(",");
         private readonly string[] longConsonants = "ch,f,jh,s,sh,th,zh,dr,tr,ts,j".Split(",");
         private readonly string[] normalConsonants = "b,d,dh,g,k,p,t,l,r".Split(',');
         private readonly Dictionary<string, string> dictionaryReplacements = ("aa=aa;ae=ae;ah=ah;ao=ao;aw=aw;ah0=ax;ay=ay;" +
@@ -32,13 +40,20 @@ namespace OpenUtau.Plugin.Builtin {
         protected override Dictionary<string, string> GetDictionaryPhonemesReplacement() => dictionaryReplacements;
 
         // For banks with missing vowels
-        private readonly Dictionary<string, string> missingphonemes = "ax=ah;aa=ah;ae=ah;ao=ow;iy=ih;uh=uw".Split(';')
+        private readonly Dictionary<string, string> missingVphonemes = "ax=ah,aa=ah,ae=ah,ao=ow,iy=ih,uh=uw".Split(',')
                 .Select(entry => entry.Split('='))
                 .Where(parts => parts.Length == 2)
                 .Where(parts => parts[0] != parts[1])
                 .ToDictionary(parts => parts[0], parts => parts[1]);
+        private bool isMissingVPhonemes = false;
 
-        private bool isMissingPhonemes = false;
+        // For banks with missing custom consonants
+        private readonly Dictionary<string, string> missingCphonemes = "by=b,dy=d,fy=f,gy=g,hy=hh,jy=jh,ky=k,ly=l,my=m,py=p,ry=r,sy=s,ty=t,vy=v,zy=z,bw=b,chw=ch,dw=d,fw=f,gw=g,hw=hh,jw=jh,kw=k,lw=l,mw=m,nw=n,pw=p,rw=r,sw=s,tw=t,vw=v,zw=w,ts=t".Split(',')
+                .Select(entry => entry.Split('='))
+                .Where(parts => parts.Length == 2)
+                .Where(parts => parts[0] != parts[1])
+                .ToDictionary(parts => parts[0], parts => parts[1]);
+        private bool isMissingCPhonemes = false;
 
         protected override IG2p LoadBaseDictionary() {
             var g2ps = new List<IG2p>();
@@ -68,9 +83,7 @@ namespace OpenUtau.Plugin.Builtin {
 
         protected override List<string> ProcessSyllable(Syllable syllable) {
             // fallback to available phoneme
-            if (!HasOto("ax", syllable.tone)) {
-                isMissingPhonemes = true;
-            }
+            
 
             string prevV = syllable.prevV;
             string[] cc = syllable.cc;
@@ -88,13 +101,25 @@ namespace OpenUtau.Plugin.Builtin {
                 phonemes.Add($"{symbols[i]} {symbols[i + 1]}");
             }
 
+            
+            if (!HasOto("ax", syllable.tone)) {
+                isMissingVPhonemes = true;
+                v = ValidateAlias(v);
+                prevV = ValidateAlias(prevV);
+            }
+            if (!HasOto("bw", syllable.tone)) {
+                isMissingCPhonemes = true;
+                
+            }
+
+            // STARTING V
             if (syllable.IsStartingV) {
-                if (HasOto(rv, syllable.vowelTone) || HasOto(ValidateAlias(rv), syllable.vowelTone)) {
-                    basePhoneme = rv;
-                } else {
-                    basePhoneme = v;
-                }
-            } else if (syllable.IsVV) {
+                // Tries - V, -V then defaults to V
+                basePhoneme = CheckAliasFormatting(v, "cv", syllable.vowelTone, "");
+               
+            }
+            // V V
+            else if (syllable.IsVV) {
                 var vv = $"{prevV} {v}";
                 if (!CanMakeAliasExtension(syllable)) {
                     if (HasOto(vv, syllable.vowelTone) || HasOto(ValidateAlias(vv), syllable.vowelTone)) {
@@ -103,37 +128,30 @@ namespace OpenUtau.Plugin.Builtin {
                         basePhoneme = v;
                     }
                 } else {
-                    // the previous alias will be extended
+                    // The previous alias will be extended
                     basePhoneme = null;
                 }
-
-            } else { // VCV (for funssies and experimental)
-                var vcv = $"{prevV} {cc[0]}{v}";
-                var vccv = $"{prevV} {string.Join("", cc)}{v}";
-                var crv = $"{cc.Last()} {v}";
-
-                // Handle VCV and VCCV cases
-                if (syllable.IsVCVWithOneConsonant && (HasOto(vcv, syllable.vowelTone) || HasOto(ValidateAlias(vcv), syllable.vowelTone))) {
+            }
+            // IF VCV (EXPERIMENTAL)
+            else if (syllable.IsVCVWithOneConsonant) {
+                var vcv = $"{prevV} {cc[0]} {v}";
+                if (HasOto(vcv, syllable.vowelTone)) {
                     basePhoneme = vcv;
-                } else if (syllable.IsVCVWithMoreThanOneConsonant && (HasOto(vccv, syllable.vowelTone) || HasOto(ValidateAlias(vccv), syllable.vowelTone))) {
-                    basePhoneme = vccv;
                 } else {
-                    basePhoneme = cc.Last() + v;
-
-                    // Check additional conditions for choosing base phoneme
-                    // ...
-
-                    if (!HasOto(cc.Last() + v, syllable.vowelTone) && (HasOto(crv, syllable.vowelTone) || HasOto(ValidateAlias(crv), syllable.vowelTone))) {
-                        basePhoneme = crv;
-                    }
-
+                    var cv = $"{cc[0]} {v}";
+                    basePhoneme = cv;
                 }
+            } else {
+                // IS VCV WITH MORE THAN ONE CONSONANT
+                basePhoneme = $"{cc.Last()} {v}";
+
+                var max = cc.Length;
+                var min = 0;
             }
 
             phonemes.Add(basePhoneme);
             return phonemes;
         }
-
 
 
         protected override List<string> ProcessEnding(Ending ending) {
@@ -149,18 +167,20 @@ namespace OpenUtau.Plugin.Builtin {
             string[] cc = ending.cc;
             string v = ending.prevV;
 
-            var vr = $"-";
-            if (ending.IsEndingV) {
-                TryAddPhoneme(phonemes, ending.tone, vr);
-            }
-            return phonemes;
+            
+         return phonemes;
         }
 
         protected override string ValidateAlias(string alias) {
             // Validate alias depending on method
 
-            if (isMissingPhonemes) {
-                foreach (var syllable in missingphonemes) {
+            if (isMissingVPhonemes) {
+                foreach (var syllable in missingVphonemes) {
+                    alias = alias.Replace(syllable.Key, syllable.Value);
+                }
+            }
+            if (isMissingCPhonemes) {
+                foreach (var syllable in missingCphonemes) {
                     alias = alias.Replace(syllable.Key, syllable.Value);
                 }
             }
@@ -1451,7 +1471,7 @@ namespace OpenUtau.Plugin.Builtin {
                 return alias.Replace("dx", "d");
             }
             if (alias == "l hh") {
-                return alias.Replace("l hh", "l l");
+                return alias.Replace("l", "r");
             }
             if (alias == "l jh") {
                 return alias.Replace("jh", "d");
@@ -2117,7 +2137,7 @@ namespace OpenUtau.Plugin.Builtin {
             bool hasL = false;
             bool hasR = false;
             bool hasSuffix = false;
-            
+
             foreach (var c in longConsonants) {
                 if (alias.Contains(c) && !alias.StartsWith(c) && !alias.Contains("ng -")) {
                     return base.GetTransitionBasicLengthMs() * 2.3;
@@ -2155,39 +2175,42 @@ namespace OpenUtau.Plugin.Builtin {
                 }
             }
 
-            foreach (var c in endingGlides) {
-                if (alias.Contains(c) && !alias.StartsWith(c)) {
-                    foreach (var vowel in "aa,ax,ae,ah,ao,aw,ay,eh,er,ey,ih,iy,ow,oy,uh,uw".Split(",")) {
-                        if (alias.Contains($"{vowel} {c}")) {
-                            return base.GetTransitionBasicLengthMs() * 2.5;
-                        }
+            var excludedVowels = new List<string> { "a", "e", "i", "o", "u" };
+            foreach (var c in connectingGlides) {
+                foreach (var v in vowels.Except(excludedVowels)) {
+                    if (alias.Contains($"{v} {c}")) {
+                        return base.GetTransitionBasicLengthMs() * 2.5;
+
                     }
                 }
             }
+
             if (hasL) {
                 return base.GetTransitionBasicLengthMs() * 1.3; // Value for 'l'
             } else if (hasR) {
                 return base.GetTransitionBasicLengthMs() * 1.4; // Value for 'r'
             }
 
+            var arpabetFirstVDiphthong = new List<string> { "a", "e", "i", "o", "u" };
+            var excludedEndings = new List<string> { $"{arpabetFirstVDiphthong}y -", $"{arpabetFirstVDiphthong}w -", $"{arpabetFirstVDiphthong}r -", };
             foreach (var c in semilongConsonants) {
-                if (alias.Contains(c) && !alias.StartsWith(c) && !alias.Contains("ay -") && !alias.Contains("ey -") && !alias.Contains("oy -")
-                     && !alias.Contains("iy -") && !alias.Contains("aw -") && !alias.Contains("ow -") && !alias.Contains("er -")
-                     && !alias.Contains($"{c} -") && !alias.Contains("ng -")) {
-                    return base.GetTransitionBasicLengthMs() * 1.75;
+                foreach (var v in semilongConsonants.Except(excludedEndings)) {
+                    if (alias.Contains(c) && !alias.StartsWith(c) && !alias.Contains($"{c} -")) {
+                        return base.GetTransitionBasicLengthMs() * 1.75;
+                    }
                 }
             }
 
             // Check if the alias ends with a consonant or vowel
             foreach (var c in consonants) {
-                if (alias.Contains(c) && alias.Contains('-') && alias.StartsWith(c) || alias.Contains($"{c} - {AreTonesFromTheSameSubbank}")) {
+                if (alias.Contains(c) && alias.Contains('-') && alias.StartsWith(c) || Regex.IsMatch(alias, @"_?[A-G](#|b)?[1-7]")) {
                     isEndingConsonant = true;
                     break;
                 }
             }
 
             foreach (var v in vowels) {
-                if (alias.Contains(v) && alias.Contains('-') && alias.StartsWith(v) || alias.Contains($"{v} - {AreTonesFromTheSameSubbank}")) {
+                if (alias.Contains(v) && alias.Contains('-') && alias.StartsWith(v) || Regex.IsMatch(alias, @"_?[A-G](#|b)?[1-7]")) {
                     isEndingVowel = true;
                     break;
                 }
@@ -2213,8 +2236,35 @@ namespace OpenUtau.Plugin.Builtin {
                 return base.GetTransitionBasicLengthMs() * 0.5;
             }
 
-            
+
             return base.GetTransitionBasicLengthMs() * transitionMultiplier;
+        }
+        private string CheckAliasFormatting(string alias, string type, int tone, string prevV) {
+
+            var checkAliasFormat = "";
+            string[] aliasFormats = new string[] { "- ", "-", "", " -", "-", "", prevV, prevV + " ", "_", "", prevV, " " + prevV };
+            var startingI = 0;
+            var endingI = aliasFormats.Length;
+
+            
+            if (type == "-") {
+                startingI = 3;
+                endingI = startingI + 1;
+            }
+
+
+            for (int i = startingI; i <= endingI; i++) {
+                if (type.Contains("-")) {
+                    checkAliasFormat = alias + aliasFormats[i];
+                } else checkAliasFormat = aliasFormats[i] + alias;
+
+                if (HasOto(checkAliasFormat, tone)) {
+                    alias = checkAliasFormat;
+                    return alias;
+                }
+            }
+
+            return "no alias found";
         }
     }
 }
