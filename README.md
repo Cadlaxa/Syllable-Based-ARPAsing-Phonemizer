@@ -31,13 +31,14 @@ This Phonemizer was optimized for **`Arpasing 0.1.0`** and **`Arpasing 0.2.0`** 
   - Ending V: `[v -]`
 
 - **Phoneme length are specified directly to the phonemizer:**
-  - Default transition in ms: '0.50'
+  - Default transition in ms: '1.0'
   - Vowels: 'default'
   - Consonants: '1.3'
   - Affricates: '1.5'
   - Long Consonants: '2.3'
   - Semi-long Consonants: '1.3'
   - Tap Consonant: '0.5'
+  - Glide Consonants: '2.5'
  - - - -
 ### Vowel and Consonant Fallbacks
 - **This custom Phonemizer supports vowel and consonant fallbacks:**
