@@ -24,7 +24,7 @@ This Phonemizer was optimized for **`Arpasing 0.1.0`** and **`Arpasing 0.2.0`** 
   - Starting C: `[- c]`
   - Starting V: `[- v]`
   - VV: `(with V and CV fallbacks if there's so VV available on the bank)`
-  - Connecting CV: `[c v]`
+  - Connecting CV: `[c v]` (Fallbacks to `[CV]`if no alias is detected)
   - Connecting VC: `[v c]`
   - Connecting CC: `[c c]` (with consonant fallbacks)
   - Ending C: `[c -]`
@@ -42,7 +42,7 @@ This Phonemizer was optimized for **`Arpasing 0.1.0`** and **`Arpasing 0.2.0`** 
  - - - -
 ### Vowel and Consonant Fallbacks
 - **This custom Phonemizer supports vowel and consonant fallbacks:**
-  - CV Fallback: `[c v]`
+  - CV Fallback: `[c v]` or `[CV]`
   - VV Fallback: `(with V and CV fallbacks if there's so VV available on the bank)`
   - Connecting VC Fallback: `[v c]`
  - - - -
