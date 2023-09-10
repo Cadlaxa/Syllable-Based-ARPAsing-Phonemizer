@@ -15,6 +15,9 @@ using YamlDotNet.Core.Tokens;
 
 namespace OpenUtau.Plugin.Builtin {
     [Phonemizer("Arpasing+ Phonemizer", "EN ARPA+", "Cadlaxa", language: "EN")]
+    // Custom ARPAsing Phonemizer for OU
+    // main focus of this Phonemizer is to bring fallbacks to existing available phonemes from
+    // ARPAsing 0.1.0 and 0.2.0 banks
     public class ArpasingPlusPhonemizer : SyllableBasedPhonemizer {
         protected IG2p g2p;
         private readonly string[] vowels = {
@@ -28,8 +31,8 @@ namespace OpenUtau.Plugin.Builtin {
         private readonly string[] consonants = "b,ch,d,dh,dr,dx,f,g,hh,jh,k,l,m,n,ng,p,q,r,s,sh,t,th,tr,v,w,y,z,zh".Split(',');
         private readonly string[] affricates = "ch,jh,j".Split(',');
         private readonly string[] tapConsonant = "dx".Split(",");
-        private readonly string[] semilongConsonants = "w,ng,n,m,v,z,q,hh".Split(",");
-        private readonly string[] connectingGlides = "l,r,y".Split(",");
+        private readonly string[] semilongConsonants = "y,w,ng,n,m,v,z,q,hh".Split(",");
+        private readonly string[] connectingGlides = "l,r".Split(",");
         private readonly string[] longConsonants = "ch,f,jh,s,sh,th,zh,dr,tr,ts,j".Split(",");
         private readonly string[] normalConsonants = "b,d,dh,g,k,p,t,l,r".Split(',');
         private readonly string[] connectingNormCons = "b,d,g,k,p,t,dh".Split(',');
@@ -61,7 +64,19 @@ namespace OpenUtau.Plugin.Builtin {
                 .ToDictionary(parts => parts[0], parts => parts[1]);
         private bool isMissingCPhonemes = false;
 
-
+        private readonly Dictionary<string, string> vvExceptions =
+            new Dictionary<string, string>() {
+                {"aw","w"},
+                {"ow","w"},
+                {"uw","w"},
+                {"uh","w"},
+                {"ay","y"},
+                {"ey","y"},
+                {"iy","y"},
+                {"oy","y"},
+                {"ih","y"},
+                {"er","r"},
+            };
 
         protected override IG2p LoadBaseDictionary() {
             var g2ps = new List<IG2p>();
@@ -116,35 +131,66 @@ namespace OpenUtau.Plugin.Builtin {
 
             }
 
-
             // STARTING V
             if (syllable.IsStartingV) {
-                // Tries - V, -V then defaults to V
+                // TRIES - V, -V THEN DEFAULTS TO V
                 basePhoneme = CheckAliasFormatting(v, "cv", syllable.vowelTone, "");
             }
             // V V
             else if (syllable.IsVV) {
-                var vv = $"{prevV} {v}";
                 if (!CanMakeAliasExtension(syllable)) {
-                    if (HasOto(vv, syllable.vowelTone) || HasOto(ValidateAlias(vv), syllable.vowelTone)) {
-                        basePhoneme = vv;
+                    basePhoneme = $"{prevV} {v}";
+                    if (!HasOto(basePhoneme, syllable.vowelTone) && vvExceptions.ContainsKey(prevV) && prevV != v) {
+                        // VV IS NOT PRESENT, CHECKS VVEXCEPTIONS LOGIC
+                        var vc = $"{prevV} {vvExceptions[prevV]}";
+                        if (!HasOto(vc, syllable.vowelTone)) {
+                            vc = $"{prevV} {vvExceptions[prevV]}";
+                        }
+                        phonemes.Add(vc);
+                        var crv = $"{vvExceptions[prevV]} {v}";
+                        basePhoneme = crv;
                     } else {
-                        basePhoneme = v;
+                        {
+                            var diphthongVowel = new List<string> { "aw", "ay", "ey", "iy", "ow", "oy", "uw" };
+                            var diphthongVV = new List<string> { };
+                            var nonDiphthongVowels = vowels.Except(diphthongVowel);
+                            var vv = $"{prevV} {v}";
+                            // GENERATES DIPHTHONG VV COMBINATIONS
+                            foreach (var vowel1 in diphthongVowel) {
+                                foreach (var vowel2 in diphthongVowel) {
+                                    diphthongVV.Add($"{vowel1} {vowel2}");
+                                }
+                            }
+                            // CHECK IF VV CONTAINS DIPHTHONGS
+                            bool basePhonemeContainsDiphthongs = diphthongVV.Any(d => basePhoneme.Contains(d));
+                            // CHECK IF VV CONTAINS WITHOUT DIPHTHONGS
+                            bool hasOtoContainsVvWithoutDiphthongs = !diphthongVV.Any(d => HasOto(d, syllable.vowelTone));
+                            // LOGIC OF VV BASEPHONEME
+                            if (!HasOto(basePhoneme, syllable.vowelTone)) {
+                                if (basePhonemeContainsDiphthongs) {
+                                    basePhoneme = vv;
+                                } else if (hasOtoContainsVvWithoutDiphthongs) {
+                                    basePhoneme = v;
+                                } else {
+                                    basePhoneme = v;
+                                }
+                            }
+
+                        }
+
                     }
                 } else {
-                    // The previous alias will be extended
+                    // PREVIOUS ALIAS WILL EXTEND
                     basePhoneme = null;
                 }
             }
-
             // IF VCV (EXPERIMENTAL)
             else if (syllable.IsVCVWithOneConsonant) {
                 var vcv = $"{prevV} {cc[0]} {v}";
                 var vcnv = $"{prevV} {cc[0]}{v}";
                 if (HasOto(vcv, syllable.vowelTone) && !HasOto(vcnv, syllable.vowelTone)) {
                     basePhoneme = vcv;
-                }
-                else if (!HasOto(vcv, syllable.vowelTone) && HasOto(vcnv, syllable.vowelTone)) {
+                } else if (!HasOto(vcv, syllable.vowelTone) && HasOto(vcnv, syllable.vowelTone)) {
                     basePhoneme = vcnv;
                 } else {
                     var cv = $"{cc[0]} {v}";
@@ -157,7 +203,7 @@ namespace OpenUtau.Plugin.Builtin {
                 var max = cc.Length;
                 var min = 0;
             }
-            // C V, then CV
+            // C V, THEN CV
             if (syllable.IsStartingCVWithOneConsonant) {
                 var crv = $"{cc[0]} {v}";
                 var cnv = $"{cc[0]}{v}";
@@ -169,15 +215,10 @@ namespace OpenUtau.Plugin.Builtin {
                     basePhoneme = crv;
                 }
             }
-
-
             phonemes.Add(basePhoneme);
             return phonemes;
 
         }
-
-
-
 
         protected override List<string> ProcessEnding(Ending ending) {
             var phonemes = new List<string>();
@@ -304,6 +345,8 @@ namespace OpenUtau.Plugin.Builtin {
             { "z uw", new List<string> { "s uw" } },
             { "zh uw", new List<string> { "sh uw" } },
             { "q ay", new List<string> { "q ah" } },
+            { " oy", new List<string> { " ow" } },
+            { "oy", new List<string> { "ow" } },
 
             };
             foreach (var vowel in CVReplacements) {
@@ -330,164 +373,61 @@ namespace OpenUtau.Plugin.Builtin {
             if (CVReplacements.ContainsKey(alias)) {
                 alias = CVReplacements[alias][0];
             }
-
-
             Dictionary<string, List<string>> vvReplacements = new Dictionary<string, List<string>>
 {
             //VV (diphthongs)
             //ay
-            { "ay aa", new List<string> { "y aa" } },
-            { "ay ae", new List<string> { "y ae" } },
-            { "ay ah", new List<string> { "y ah" } },
-            { "ay ao", new List<string> { "y ao" } },
             { "ay aw", new List<string> { "y ae" } },
             { "ay ax", new List<string> { "y ah" } },
             { "ay ay", new List<string> { "y ah" } },
-            { "ay eh", new List<string> { "y eh" } },
-            { "ay er", new List<string> { "y er" } },
-            { "ay ey", new List<string> { "y ey" } },
-            { "ay ih", new List<string> { "y ih" } },
-            { "ay iy", new List<string> { "y iy" } },
-            { "ay ow", new List<string> { "y ow" } },
             { "ay oy", new List<string> { "y ow" } },
-            { "ay uh", new List<string> { "y uh" } },
-            { "ay uw", new List<string> { "y uw" } },
             //ey
-            { "ey aa", new List<string> { "y aa" } },
-            { "ey ae", new List<string> { "y ae" } },
-            { "ey ah", new List<string> { "y ah" } },
-            { "ey ao", new List<string> { "y ao" } },
             { "ey aw", new List<string> { "y ae" } },
             { "ey ax", new List<string> { "y ah" } },
             { "ey ay", new List<string> { "y ah" } },
-            { "ey eh", new List<string> { "y eh" } },
-            { "ey er", new List<string> { "y er" } },
-            { "ey ey", new List<string> { "y ey" } },
-            { "ey ih", new List<string> { "y ih" } },
-            { "ey iy", new List<string> { "y iy" } },
-            { "ey ow", new List<string> { "y ow" } },
+            { "ey ey", new List<string> { "iy ey" } },
             { "ey oy", new List<string> { "y ow" } },
-            { "ey uh", new List<string> { "y uh" } },
-            { "ey uw", new List<string> { "y uw" } },
             //iy
-            { "iy aa", new List<string> { "y aa" } },
-            { "iy ae", new List<string> { "y ae" } },
-            { "iy ah", new List<string> { "y ah" } },
-            { "iy ao", new List<string> { "y ao" } },
             { "iy aw", new List<string> { "y ae" } },
             { "iy ax", new List<string> { "y ah" } },
             { "iy ay", new List<string> { "y ah" } },
-            { "iy eh", new List<string> { "y eh" } },
-            { "iy er", new List<string> { "y er" } },
             { "iy ey", new List<string> { "y ey" } },
-            { "iy ih", new List<string> { "y ih" } },
-            { "iy iy", new List<string> { "y iy" } },
-            { "iy ow", new List<string> { "y ow" } },
             { "iy oy", new List<string> { "y ow" } },
-            { "iy uh", new List<string> { "y uh" } },
-            { "iy uw", new List<string> { "y uw" } },
             //oy
-            { "oy aa", new List<string> { "y aa" } },
-            { "oy ae", new List<string> { "y ae" } },
-            { "oy ah", new List<string> { "y ah" } },
-            { "oy ao", new List<string> { "y ao" } },
             { "oy aw", new List<string> { "y ae" } },
             { "oy ax", new List<string> { "y ah" } },
             { "oy ay", new List<string> { "y ah" } },
-            { "oy eh", new List<string> { "y eh" } },
-            { "oy er", new List<string> { "y er" } },
-            { "oy ey", new List<string> { "y ey" } },
-            { "oy ih", new List<string> { "y ih" } },
-            { "oy iy", new List<string> { "y iy" } },
-            { "oy ow", new List<string> { "y ow" } },
             { "oy oy", new List<string> { "y ow" } },
-            { "oy uh", new List<string> { "y uh" } },
-            { "oy uw", new List<string> { "y uw" } },
             //er
-            { "er aa", new List<string> { "r aa" } },
-            { "er ae", new List<string> { "r ae" } },
-            { "er ah", new List<string> { "r ah" } },
-            { "er ao", new List<string> { "r ao" } },
             { "er aw", new List<string> { "r ae" } },
             { "er ax", new List<string> { "r ah" } },
             { "er ay", new List<string> { "r ah" } },
-            { "er eh", new List<string> { "r eh" } },
             { "er er", new List<string> { "r r" } },
-            { "er ey", new List<string> { "r ey" } },
-            { "er ih", new List<string> { "r ih" } },
-            { "er iy", new List<string> { "r iy" } },
-            { "er ow", new List<string> { "r ow" } },
             { "er oy", new List<string> { "r ow" } },
             { "er uh", new List<string> { "r uw" } },
-            { "er uw", new List<string> { "r uw" } },
             //aw
-            { "aw aa", new List<string> { "w aa" } },
             { "aw ae", new List<string> { "w ah" } },
-            { "aw ah", new List<string> { "w ah" } },
-            { "aw ao", new List<string> { "w ao" } },
             { "aw aw", new List<string> { "w ae" } },
             { "aw ax", new List<string> { "w ah" } },
             { "aw ay", new List<string> { "w ah" } },
-            { "aw eh", new List<string> { "w eh" } },
-            { "aw er", new List<string> { "w er" } },
-            { "aw ey", new List<string> { "w ey" } },
-            { "aw ih", new List<string> { "w ih" } },
-            { "aw iy", new List<string> { "w iy" } },
-            { "aw ow", new List<string> { "w oy" } },
-            { "aw oy", new List<string> { "w ow" } },
-            { "aw uh", new List<string> { "w uh" } },
-            { "aw uw", new List<string> { "w uw" } },
+            { "aw ow", new List<string> { "w ao" } },
+            { "aw oy", new List<string> { "w ao" } },
             //ow
-            { "ow aa", new List<string> { "w aa" } },
             { "ow ae", new List<string> { "w ah" } },
-            { "ow ah", new List<string> { "w ah" } },
             { "ow ao", new List<string> { "w ao" } },
             { "ow aw", new List<string> { "w ae" } },
             { "ow ax", new List<string> { "w ah" } },
             { "ow ay", new List<string> { "w ah" } },
-            { "ow eh", new List<string> { "w eh" } },
-            { "ow er", new List<string> { "w er" } },
-            { "ow ey", new List<string> { "w ey" } },
-            { "ow ih", new List<string> { "w ih" } },
-            { "ow iy", new List<string> { "w iy" } },
-            { "ow ow", new List<string> { "w ow" } },
-            { "ow oy", new List<string> { "w ow" } },
-            { "ow uh", new List<string> { "w uh" } },
-            { "ow uw", new List<string> { "w uw" } },
+            { "ow ow", new List<string> { "w ao" } },
+            { "ow oy", new List<string> { "w ao" } },
             //uw
-            { "uw aa", new List<string> { "w aa" } },
             { "uw ae", new List<string> { "w ah" } },
-            { "uw ah", new List<string> { "w ah" } },
-            { "uw ao", new List<string> { "w ao" } },
             { "uw aw", new List<string> { "w ae" } },
             { "uw ax", new List<string> { "w ah" } },
             { "uw ay", new List<string> { "w ah" } },
-            { "uw eh", new List<string> { "w eh" } },
-            { "uw er", new List<string> { "w er" } },
-            { "uw ey", new List<string> { "w ey" } },
-            { "uw ih", new List<string> { "w ih" } },
-            { "uw iy", new List<string> { "w iy" } },
-            { "uw ow", new List<string> { "w ow" } },
-            { "uw oy", new List<string> { "w ow" } },
-            { "uw uh", new List<string> { "w uh" } },
+            { "uw ow", new List<string> { "w ao" } },
+            { "uw oy", new List<string> { "w ao" } },
             { "uw uw", new List<string> { "w uw" } },
-            //uh
-            { "uh aa", new List<string> { "w aa" } },
-            { "uh ae", new List<string> { "w ah" } },
-            { "uh ah", new List<string> { "w ah" } },
-            { "uh ao", new List<string> { "w ao" } },
-            { "uh aw", new List<string> { "w ae" } },
-            { "uh ax", new List<string> { "w ah" } },
-            { "uh ay", new List<string> { "w ah" } },
-            { "uh eh", new List<string> { "w eh" } },
-            { "uh er", new List<string> { "w er" } },
-            { "uh ey", new List<string> { "w ey" } },
-            { "uh ih", new List<string> { "w ih" } },
-            { "uh iy", new List<string> { "w iy" } },
-            { "uh ow", new List<string> { "w ow" } },
-            { "uh oy", new List<string> { "w ow" } },
-            { "uh uh", new List<string> { "w uh" } },
-            { "uh uw", new List<string> { "w uw" } },
             };
 
             foreach (var kvp in vvReplacements) {
@@ -501,7 +441,6 @@ namespace OpenUtau.Plugin.Builtin {
             foreach (var V in new[] { " oy" }) {
                 alias = alias.Replace(" oy", " ow");
             }
-
             //CV (dx, dr, tr, zh)
             if (alias == "dx aa" || alias == "dx ae" || alias == "dx ah" || alias == "dx ao" || alias == "dx aw" || alias == "dx aa"
                 || alias == "dx ay" || alias == "dx eh" || alias == "dx er" || alias == "dx ey" || alias == "dx ih" || alias == "dx iy"
@@ -1080,7 +1019,7 @@ namespace OpenUtau.Plugin.Builtin {
                 return alias.Replace("ch q", "ch -");
             }
             if (alias == "ch r") {
-                return alias.Replace("ch", "s");
+                return alias.Replace("ch r", "ch ah");
             }
             if (alias == "ch s") {
                 return alias.Replace("ch", "s");
@@ -1742,7 +1681,7 @@ namespace OpenUtau.Plugin.Builtin {
                 return alias.Replace("sh p", "sh -");
             }
             if (alias == "sh q") {
-                return alias.Replace("sh p", "sh -");
+                return alias.Replace("sh q", "sh -");
             }
             if (alias == "sh r") {
                 return alias.Replace("sh", "s");
@@ -2162,12 +2101,12 @@ namespace OpenUtau.Plugin.Builtin {
             bool isEndingVowel = false;
             bool hasCons = false;
             bool hasSuffix = false;
-            var numbers = new List<string> { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             var excludedVowels = new List<string> { "a", "e", "i", "o", "u" };
             var GlideVCCons = new List<string> { $"{excludedVowels} {connectingGlides}" };
             var NormVCCons = new List<string> { $"{excludedVowels} {connectingNormCons}" };
             var arpabetFirstVDiphthong = new List<string> { "a", "e", "i", "o", "u" };
             var excludedEndings = new List<string> { $"{arpabetFirstVDiphthong}y -", $"{arpabetFirstVDiphthong}w -", $"{arpabetFirstVDiphthong}r -", };
+            var numbers = new List<string> { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
             foreach (var c in longConsonants) {
                 if (alias.Contains(c) && !alias.StartsWith(c) && !alias.Contains("ng -")) {
@@ -2240,7 +2179,7 @@ namespace OpenUtau.Plugin.Builtin {
 
             foreach (var c in semilongConsonants) {
                 foreach (var v in semilongConsonants.Except(excludedEndings)) {
-                    if (alias.Contains(c) && !alias.StartsWith(c)) {
+                    if (alias.Contains(c) && !alias.StartsWith(c) && !alias.Contains($"{c} -")) {
                         return base.GetTransitionBasicLengthMs() * 2.0;
                     }
                 }
