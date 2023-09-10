@@ -148,7 +148,11 @@ namespace OpenUtau.Plugin.Builtin {
                         }
                         phonemes.Add(vc);
                         var crv = $"{vvExceptions[prevV]} {v}";
+                        var cv = $"{vvExceptions[prevV]}{v}";
                         basePhoneme = crv;
+                        if (!HasOto(crv, syllable.vowelTone)) {
+                            basePhoneme = cv;
+                        }
                     } else {
                         {
                             var diphthongVowel = new List<string> { "aw", "ay", "ey", "iy", "ow", "oy", "uw" };
