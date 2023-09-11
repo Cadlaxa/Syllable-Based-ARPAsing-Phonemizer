@@ -133,8 +133,13 @@ namespace OpenUtau.Plugin.Builtin {
 
             // STARTING V
             if (syllable.IsStartingV) {
-                // TRIES - V, -V THEN DEFAULTS TO V
-                basePhoneme = CheckAliasFormatting(v, "cv", syllable.vowelTone, "");
+                // TRIES - V, THEN V
+                var rv = $"- {v}";
+                if (HasOto(rv, syllable.vowelTone) || HasOto(ValidateAlias(rv), syllable.vowelTone)) {
+                    basePhoneme = rv;
+                } else {
+                    basePhoneme = v;
+                }
             }
             // V V
             else if (syllable.IsVV) {
@@ -149,9 +154,9 @@ namespace OpenUtau.Plugin.Builtin {
                         phonemes.Add(vc);
                         var crv = $"{vvExceptions[prevV]} {v}";
                         var cv = $"{vvExceptions[prevV]}{v}";
-                        basePhoneme = crv;
-                        if (!HasOto(crv, syllable.vowelTone)) {
-                            basePhoneme = cv;
+                        basePhoneme = cv;
+                        if (!HasOto(cv, syllable.vowelTone)) {
+                            basePhoneme = crv;
                         }
                     } else {
                         {
@@ -174,7 +179,7 @@ namespace OpenUtau.Plugin.Builtin {
                                 if (basePhonemeContainsDiphthongs) {
                                     basePhoneme = vv;
                                 } else if (hasOtoContainsVvWithoutDiphthongs) {
-                                    basePhoneme = v;
+                                    basePhoneme = vv;
                                 } else {
                                     basePhoneme = v;
                                 }
@@ -1153,8 +1158,7 @@ namespace OpenUtau.Plugin.Builtin {
             if (alias == "f b" || alias == "f d" || alias == "f ch" || alias == "f dh"
                 || alias == "f f" || alias == "f g" || alias == "f hh" || alias == "f jh" || alias == "f k"
                 || alias == "f l" || alias == "f m" || alias == "f n" || alias == "f p"
-                || alias == "f r" || alias == "f s" || alias == "f t"
-                || alias == "f w") {
+                || alias == "f r" || alias == "f s" || alias == "f t") {
                 return alias.Replace("f", "s");
             }
             //CC (f specific)
@@ -1181,6 +1185,9 @@ namespace OpenUtau.Plugin.Builtin {
             }
             if (alias == "f v") {
                 return alias.Replace("f v", "f -");
+            }
+            if (alias == "f w") {
+                return alias.Replace("f w", "f uw");
             }
             if (alias == "f z") {
                 return alias.Replace("z", "s");
@@ -1299,7 +1306,7 @@ namespace OpenUtau.Plugin.Builtin {
                 return alias.Replace("hh v", "th -");
             }
             if (alias == "hh w") {
-                return alias.Replace("hh", "f");
+                return alias.Replace("hh w", "hh uw");
             }
             if (alias == "hh y") {
                 return alias.Replace("hh", "f");
@@ -1399,7 +1406,7 @@ namespace OpenUtau.Plugin.Builtin {
                 return alias.Replace("jh zh", "jh -");
             }
             //CC (k)
-            if (alias == "k b" || alias == "k d" || alias == "k dh"
+            if (alias == "k b" || alias == "k d" || alias == "k ch" || alias == "k dh"
             || alias == "k f" || alias == "k g" || alias == "k hh" || alias == "k jh" || alias == "k k"
             || alias == "k l" || alias == "k m" || alias == "k n" || alias == "k ng" || alias == "k p" || alias == "k q"
             || alias == "k r" || alias == "k s" || alias == "k sh" || alias == "k t" || alias == "k th"
@@ -2174,7 +2181,7 @@ namespace OpenUtau.Plugin.Builtin {
 
             foreach (var c in connectingGlides) {
                 foreach (var v in vowels.Where(v => excludedVowels.Contains(v))) {
-                    if (alias.Contains($"{v} {c}")) {
+                    if (alias.Contains($"{v} r")) {
                         return base.GetTransitionBasicLengthMs() * 0.6;
 
                     }
@@ -2232,62 +2239,6 @@ namespace OpenUtau.Plugin.Builtin {
 
             return base.GetTransitionBasicLengthMs() * transitionMultiplier;
         }
-        private string CheckAliasFormatting(string alias, string type, int tone, string prevV) {
-
-            var checkAliasFormat = "";
-            string[] aliasFormats = new string[] { "- ", "-", "", " -", "-", "", prevV, prevV + " ", "_", "", prevV, " " + prevV };
-            var startingI = 0;
-            var endingI = aliasFormats.Length;
-
-
-            if (type == "ending-") {
-                startingI = 3;
-                endingI = startingI + 1;
-            }
-
-            if (type == "ending -") {
-                startingI = 3;
-                endingI = startingI + 2;
-            }
-
-            if (type == "rcv") {
-                startingI = 0;
-                endingI = startingI + 1;
-            }
-
-            if (type == "crv") {
-                startingI = 1;
-                endingI = startingI + 1;
-            }
-
-            if (type == "vv") {
-                startingI = 6;
-                endingI = startingI + 3;
-            }
-
-            if (type == "cc") {
-                startingI = 6;
-                endingI = startingI + 1;
-            }
-
-            if (type == "cv") {
-                startingI = 0;
-                endingI = startingI + 2;
-            }
-
-
-            for (int i = startingI; i <= endingI; i++) {
-                if (type.Contains("ending")) {
-                    checkAliasFormat = alias + aliasFormats[i];
-                } else checkAliasFormat = aliasFormats[i] + alias;
-
-                if (HasOto(checkAliasFormat, tone)) {
-                    alias = checkAliasFormat;
-                    return alias;
-                }
-            }
-
-            return "no alias";
-        }
     }
 }
+       
