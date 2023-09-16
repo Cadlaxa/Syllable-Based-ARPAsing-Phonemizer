@@ -2,8 +2,8 @@
 Custom English Arpabet Phonemizer based on Syllable-Based API Phonemizer
  
 This Phonemizer was optimized for **`Arpasing 0.1.0`** and **`Arpasing 0.2.0`** banks **(the original list, Kanru Hua made)** made for [Openutau](https://www.openutau.com/).
-
-#### 📍 if there's any issue on the Phonemizer, you can contact me through my [Twitter](https://twitter.com/cadlaxa). Let me know if there's a problem tehee.
+#### 📍 if you want to suggest a feature for ARPA+, you can suggest on the issues tab
+#### 📍 if there's any issue with the Phonemizer, you can contact me through my [Twitter](https://twitter.com/cadlaxa). Let me know if there's a problem tehee.
  - - - -
 ### Table of contents
 - **[How to download and install the custom Phonemizer](https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/blob/main/README.md#how-to-download-and-install-the-custom-phonemizer)**
