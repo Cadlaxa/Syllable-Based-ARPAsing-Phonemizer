@@ -12,6 +12,7 @@ using OpenUtau.Core.G2p;
 using OpenUtau.Core.Ustx;
 using Serilog;
 using YamlDotNet.Core.Tokens;
+using static OpenUtau.Api.Phonemizer;
 
 namespace OpenUtau.Plugin.Builtin {
     [Phonemizer("Arpasing+ Phonemizer", "EN ARPA+", "Cadlaxa", language: "EN")]
@@ -21,7 +22,7 @@ namespace OpenUtau.Plugin.Builtin {
     public class ArpasingPlusPhonemizer : SyllableBasedPhonemizer {
         protected IG2p g2p;
         private readonly string[] vowels = {
-        "aa", "ax", "ae", "ah", "ao", "aw", "ay", "eh", "er", "ey", "ih", "iy", "ow", "oy", "uh", "uw", "a", "e", "i", "o", "u", "ai", "ei", "oi", "au", "ou",
+        "aa", "ax", "ae", "ah", "ao", "aw", "ay", "eh", "er", "ey", "ih", "iy", "ow", "oy", "uh", "uw", "a", "e", "i", "o", "u", "ai", "ei", "oi", "au", "ou", "ix", "ux",
         "aar", "ar", "axr", "aer", "ahr", "aor", "or", "awr", "aur", "ayr", "air", "ehr", "eyr", "eir", "ihr", "iyr", "ir", "owr", "our", "oyr", "oir", "uhr", "uwr", "ur",
         "aal", "al", "axl", "ael", "ahl", "aol", "ol", "awl", "aul", "ayl", "ail", "ehl", "el", "eyl", "eil", "ihl", "iyl", "il", "owl", "oul", "oyl", "oil", "uhl", "uwl", "ul",
         "naan", "an", "axn", "aen", "ahn", "aon", "on", "awn", "aun", "ayn", "ain", "ehn", "en", "eyn", "ein", "ihn", "iyn", "in", "own", "oun", "oyn", "oin", "uhn", "uwn", "un",
@@ -36,7 +37,7 @@ namespace OpenUtau.Plugin.Builtin {
         private readonly string[] longConsonants = "ch,f,jh,s,sh,th,zh,dr,tr,ts,j".Split(",");
         private readonly string[] normalConsonants = "b,d,dh,g,k,p,t,l,r".Split(',');
         private readonly string[] connectingNormCons = "b,d,g,k,p,t,dh".Split(',');
-        private readonly Dictionary<string, string> dictionaryReplacements = ("aa=aa;ae=ae;ah=ah;ao=ao;aw=aw;ah0=ax;ay=ay;" +
+        private readonly Dictionary<string, string> dictionaryReplacements = ("aa=aa;ae=ae;ah=ah;ao=ao;aw=aw;ax=ax;ay=ay;" +
             "b=b;ch=ch;d=d;dh=dh;" + "dx=dx;eh=eh;er=er;ey=ey;f=f;g=g;hh=hh;ih=ih;iy=iy;jh=jh;k=k;l=l;m=m;n=n;ng=ng;ow=ow;oy=oy;" +
             "p=p;q=q;r=r;s=s;sh=sh;t=t;th=th;" + "uh=uh;uw=uw;v=v;w=w;" + "y=y;z=z;zh=zh").Split(';')
                 .Select(entry => entry.Split('='))
@@ -47,9 +48,9 @@ namespace OpenUtau.Plugin.Builtin {
         protected override string[] GetConsonants() => consonants;
         protected override string GetDictionaryName() => "cmudict-0_7b.txt";
         protected override Dictionary<string, string> GetDictionaryPhonemesReplacement() => dictionaryReplacements;
-
+        
         // For banks with missing vowels
-        private readonly Dictionary<string, string> missingVphonemes = "ax=ah,aa=ah,ae=ah,iy=ih,uh=uw".Split(',')
+        private readonly Dictionary<string, string> missingVphonemes = "ax=ah,aa=ah,ae=ah,iy=ih,uh=uw,axr=er,ix=ih,ux=uw".Split(',')
                 .Select(entry => entry.Split('='))
                 .Where(parts => parts.Length == 2)
                 .Where(parts => parts[0] != parts[1])
@@ -57,12 +58,21 @@ namespace OpenUtau.Plugin.Builtin {
         private bool isMissingVPhonemes = false;
 
         // For banks with missing custom consonants
-        private readonly Dictionary<string, string> missingCphonemes = "by=b,dy=d,fy=f,gy=g,hy=hh,jy=jh,ky=k,ly=l,my=m,py=p,ry=r,sy=s,ty=t,vy=v,zy=z,bw=b,chw=ch,dw=d,fw=f,gw=g,hw=hh,jw=jh,kw=k,lw=l,mw=m,nw=n,pw=p,rw=r,sw=s,tw=t,vw=v,zw=w,ts=t".Split(',')
+        private readonly Dictionary<string, string> missingCphonemes = "by=b,dy=d,fy=f,gy=g,hy=hh,jy=jh,ky=k,ly=l,my=m,py=p,ry=r,sy=s,ty=t,vy=v,zy=z,bw=b,chw=ch,dw=d,fw=f,gw=g,hw=hh,jw=jh,kw=k,lw=l,mw=m,nw=n,pw=p,rw=r,sw=s,tw=t,vw=v,zw=w,ts=t,nx=n,cl=q,wh=w".Split(',')
                 .Select(entry => entry.Split('='))
                 .Where(parts => parts.Length == 2)
                 .Where(parts => parts[0] != parts[1])
                 .ToDictionary(parts => parts[0], parts => parts[1]);
         private bool isMissingCPhonemes = false;
+
+        // TIMIT symbols
+        private readonly Dictionary<string, string> timitphonemes = "axh=ax,bcl=b,dcl=d,eng=ng,gcl=g,hv=hh,kcl=k,pcl=p,tcl=t".Split(',')
+                .Select(entry => entry.Split('='))
+                .Where(parts => parts.Length == 2)
+                .Where(parts => parts[0] != parts[1])
+                .ToDictionary(parts => parts[0], parts => parts[1]);
+        private bool isTimitPhonemes = false;
+        
 
         private readonly Dictionary<string, string> vvExceptions =
             new Dictionary<string, string>() {
@@ -77,7 +87,7 @@ namespace OpenUtau.Plugin.Builtin {
                 {"ih","y"},
                 {"er","r"},
             };
-
+        
         protected override IG2p LoadBaseDictionary() {
             var g2ps = new List<IG2p>();
 
@@ -120,8 +130,6 @@ namespace OpenUtau.Plugin.Builtin {
             for (int i = 0; i < symbols.Count - 1; i++) {
                 phonemes.Add($"{symbols[i]} {symbols[i + 1]}");
             }
-
-
             if (!HasOto("ax", syllable.tone)) {
                 isMissingVPhonemes = true;
 
@@ -130,16 +138,24 @@ namespace OpenUtau.Plugin.Builtin {
                 isMissingCPhonemes = true;
 
             }
+            if (!HasOto("ɡ̚", syllable.tone)) {
+                isTimitPhonemes = true;
+
+            }
 
             // STARTING V
             if (syllable.IsStartingV) {
-                // TRIES - V, THEN V
+                // TRIES - V, -V, THEN V
                 var rv = $"- {v}";
+                var rv1 = $"-{v}";
                 if (HasOto(rv, syllable.vowelTone) || HasOto(ValidateAlias(rv), syllable.vowelTone)) {
                     basePhoneme = rv;
+                } else if (!HasOto(rv, syllable.vowelTone) || !HasOto(ValidateAlias(rv), syllable.vowelTone) && HasOto(rv1, syllable.vowelTone) || HasOto(ValidateAlias(rv1), syllable.vowelTone)) {
+                    basePhoneme = rv1;
                 } else {
                     basePhoneme = v;
                 }
+
             }
             // V V
             else if (syllable.IsVV) {
@@ -192,6 +208,7 @@ namespace OpenUtau.Plugin.Builtin {
                     // PREVIOUS ALIAS WILL EXTEND
                     basePhoneme = null;
                 }
+                
             }
             // IF VCV (EXPERIMENTAL)
             else if (syllable.IsVCVWithOneConsonant) {
@@ -212,23 +229,24 @@ namespace OpenUtau.Plugin.Builtin {
                 var max = cc.Length;
                 var min = 0;
             }
-            // C V, THEN CV
+            // C V OR CV
             if (syllable.IsStartingCVWithOneConsonant) {
                 var crv = $"{cc[0]} {v}";
-                var cnv = $"{cc[0]}{v}";
+                var cv = $"{cc[0]}{v}";
                 if (HasOto(crv, syllable.vowelTone) || HasOto(ValidateAlias(crv), syllable.vowelTone)) {
                     basePhoneme = crv;
-                } else if (!HasOto(crv, syllable.vowelTone) && HasOto(cnv, syllable.vowelTone)) {
-                    basePhoneme = cnv;
-                } else if (HasOto(crv, syllable.vowelTone) && HasOto(cnv, syllable.vowelTone)) {
+                } else if (!HasOto(crv, syllable.vowelTone) && HasOto(cv, syllable.vowelTone)) {
+                    basePhoneme = cv;
+                } else if (HasOto(crv, syllable.vowelTone) && HasOto(cv, syllable.vowelTone)) {
                     basePhoneme = crv;
                 }
             }
+
             phonemes.Add(basePhoneme);
             return phonemes;
 
         }
-
+        
         protected override List<string> ProcessEnding(Ending ending) {
             var phonemes = new List<string>();
             var symbols = new List<string>();
@@ -354,8 +372,6 @@ namespace OpenUtau.Plugin.Builtin {
             { "z uw", new List<string> { "s uw" } },
             { "zh uw", new List<string> { "sh uw" } },
             { "q ay", new List<string> { "q ah" } },
-            { " oy", new List<string> { " ow" } },
-            { "oy", new List<string> { "ow" } },
 
             };
             foreach (var vowel in CVReplacements) {
@@ -373,8 +389,8 @@ namespace OpenUtau.Plugin.Builtin {
             }
 
             // Validate alias depending on method
-            if (isMissingVPhonemes || isMissingCPhonemes) {
-                foreach (var syllable in missingVphonemes.Concat(missingCphonemes)) {
+            if (isMissingVPhonemes || isMissingCPhonemes || isTimitPhonemes) {
+                foreach (var syllable in missingVphonemes.Concat(missingCphonemes).Concat(timitphonemes)) {
                     alias = alias.Replace(syllable.Key, syllable.Value);
                 }
             }
@@ -1394,7 +1410,7 @@ namespace OpenUtau.Plugin.Builtin {
                 return alias.Replace("jh v", "jh -");
             }
             if (alias == "jh w") {
-                return alias.Replace("jh", "f");
+                return alias.Replace("jh w", "jh ah");
             }
             if (alias == "jh y") {
                 return alias.Replace("y", "iy");
@@ -1634,6 +1650,9 @@ namespace OpenUtau.Plugin.Builtin {
                 return alias.Replace("sh", "s");
             }
             if (alias == "s th") {
+                return alias.Replace("s", "z");
+            }
+            if (alias == "s v") {
                 return alias.Replace("s", "z");
             }
             if (alias == "s tr") {
@@ -2129,7 +2148,7 @@ namespace OpenUtau.Plugin.Builtin {
                 foreach (var v in normalConsonants.Except(GlideVCCons)) {
                     foreach (var b in normalConsonants.Except(NormVCCons)) {
                         if (alias.Contains(c) && !alias.StartsWith(c) &&
-                            !alias.Contains("dx") && !alias.Contains("ng")) {
+                            !alias.Contains("dx") && !alias.Contains($"{c} -")) {
                             if ("l,r,b,d,g,k,p,t,dh".Split(',').Contains(c)) {
                                 hasCons = true;
                             } else {
@@ -2172,7 +2191,7 @@ namespace OpenUtau.Plugin.Builtin {
 
             foreach (var c in connectingGlides) {
                 foreach (var v in vowels.Except(excludedVowels)) {
-                    if (alias.Contains($"{v} {c}")) {
+                    if (alias.Contains($"{v} {c}") && !alias.Contains($"{c} -") && !alias.Contains($"{v} -")) {
                         return base.GetTransitionBasicLengthMs() * 2.5;
 
                     }
@@ -2191,7 +2210,7 @@ namespace OpenUtau.Plugin.Builtin {
             foreach (var c in semilongConsonants) {
                 foreach (var v in semilongConsonants.Except(excludedEndings)) {
                     if (alias.Contains(c) && !alias.StartsWith(c) && !alias.Contains($"{c} -")) {
-                        return base.GetTransitionBasicLengthMs() * 2.0;
+                        return base.GetTransitionBasicLengthMs() * 1.6;
                     }
                 }
             }
@@ -2241,4 +2260,4 @@ namespace OpenUtau.Plugin.Builtin {
         }
     }
 }
-       
+
