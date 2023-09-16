@@ -1,7 +1,7 @@
 # Syllable-Based ARPAsing Phonemizer
 Custom English Arpabet Phonemizer based on Syllable-Based API Phonemizer
  
-This Phonemizer was optimized for **`Arpasing 0.1.0`** and **`Arpasing 0.2.0`** banks **(the original list, Kanru Hua made)** made for [Openutau](https://www.openutau.com/).
+This Phonemizer was optimized for **`Arpasing 0.1.0`** and **`Arpasing 0.2.0`** banks **(the original list, Kanru Hua made)** made for [Openutau](https://www.openutau.com/). This Phonemizer works with other ARPAsing banks with CC, VV, CV, and VC fallback plus constant uniformed phoneme lengths.
 #### 📍 if you want to suggest a feature for ARPA+, you can suggest on the issues tab
 #### 📍 if there's any issue with the Phonemizer, you can contact me through my [Twitter](https://twitter.com/cadlaxa). Let me know if there's a problem tehee.
  - - - -
