@@ -50,7 +50,7 @@ namespace OpenUtau.Plugin.Builtin {
         protected override Dictionary<string, string> GetDictionaryPhonemesReplacement() => dictionaryReplacements;
 
         // For banks with missing vowels
-        private readonly Dictionary<string, string> missingVphonemes = "ax=ah,aa=ah,ae=ah,iy=ih,uh=uw,axr==er,ix=ih,ux=uw".Split(',')
+        private readonly Dictionary<string, string> missingVphonemes = "ax=ah,aa=ah,ae=ah,iy=ih,uh=uwr,ix=ih,ux=uw".Split(',')
                 .Select(entry => entry.Split('='))
                 .Where(parts => parts.Length == 2)
                 .Where(parts => parts[0] != parts[1])
@@ -106,36 +106,19 @@ namespace OpenUtau.Plugin.Builtin {
             // SPLITS UP DR AND TR
             string[] tr = new[] { "tr" };
             string[] dr = new[] { "dr" };
-            //SPLITS UP CCV
-            List<string> ccv = new List<string>();
-            foreach (string C1 in consonants) {
-                foreach (string C2 in consonants) {
-                    ccv.Add($"{C1}{C2}");
-                }
-            }
-            //SPLITS UP CCCV
-            List<string> cccv = new List<string>();
-            foreach (string C1 in consonants) {
-                foreach (string C2 in consonants) {
-                    foreach (string C3 in consonants) {
-                        cccv.Add($"{C1}{C2}{C3}");
-                    }
-                }
-            }
+            string[] vowels = new[] { "axr" };
             foreach (string s in original) {
                 if (dr.Contains(s) && !HasOto($"{s} {vowels}", note.tone) && !HasOto($"ay {s}", note.tone)) {
                     modified.AddRange(new string[] { "jh", s[1].ToString() });
                 } else if (tr.Contains(s) && !HasOto($"{s} {vowels}", note.tone) && !HasOto($"ay {s}", note.tone)) {
                     modified.AddRange(new string[] { "ch", s[1].ToString() });
-                } else if (ccv.Contains(s) && !HasOto($"{s} {vowels}", note.tone) && !HasOto($"ay {s}", note.tone)) {
-                    modified.AddRange(new string[] { s[0].ToString(), s[1].ToString() });
-                } else if (cccv.Contains(s) && !HasOto($"{s} {vowels}", note.tone) && !HasOto($"ay {s}", note.tone)) {
-                    modified.AddRange(new string[] { s[0].ToString(), s[1].ToString(), s[2].ToString() });
+                } else if (vowels.Contains(s) && !HasOto($"v {s}", note.tone)) {
+                    modified.AddRange(new string[] { "ax", s[2].ToString() });
                 } else {
                     modified.Add(s);
                 }
             }
-                        return modified.ToArray();
+            return modified.ToArray();
         }
         protected override IG2p LoadBaseDictionary() {
             var g2ps = new List<IG2p>();
