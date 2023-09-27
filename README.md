@@ -1,7 +1,10 @@
 # Syllable-Based ARPAsing Phonemizer
 Custom English Arpabet Phonemizer based on Syllable-Based API Phonemizer
  
-This Phonemizer was optimized for **`Arpasing 0.1.0`** and **`Arpasing 0.2.0`** banks **(the original list, Kanru Hua made)** made for [Openutau](https://www.openutau.com/). This Phonemizer works with other ARPAsing banks with CC, VV, CV, and VC fallback plus constant uniformed phoneme lengths.
+~~This Phonemizer was optimized for **`Arpasing 0.1.0`** and **`Arpasing 0.2.0`** banks **(the original list, Kanru Hua made)** made for [Openutau](https://www.openutau.com/). This Phonemizer works with other ARPAsing banks with CC, VV, CV, and VC fallback plus constant uniformed phoneme lengths.~~
+
+As of version **`V0.0.55`** and above, it now supports the majority of all ARPAsing voicebanks, also **`V0.0.55`** and above is much more stable than the previous versions of this external Phonemizer.
+
 #### 📍 if you want to suggest a feature for ARPA+, you can suggest on the issues tab
 #### 📍 if there's any issue with the Phonemizer, you can contact me through my [Twitter](https://twitter.com/cadlaxa). Let me know if there's a problem tehee.
  - - - -
@@ -22,11 +25,12 @@ This Phonemizer was optimized for **`Arpasing 0.1.0`** and **`Arpasing 0.2.0`** 
 - **Syllables are built like:**
 
   - Starting C: `[- c]`
-  - Starting V: `[- v]`
+  - Starting CV: `[- c v]` or `[- cv]`
+  - Starting V: `[- v]` or `[v]`
   - VV: `(Fallbacks to [V C][C V]/[CV] then [C V]/[CV] then finally [V])`
   - Connecting CV: `[c v]` (Fallbacks to `[CV]`if no alias is detected)
   - Connecting VC: `[v c]`
-  - Connecting CC: `[c c]` (with consonant fallbacks)
+  - Connecting CC: `[c c]` (with consonant fallbacks) then `[c1 -]` `[- c2]`
   - Ending C: `[c -]`
   - Ending V: `[v -]`
 
@@ -45,6 +49,8 @@ This Phonemizer was optimized for **`Arpasing 0.1.0`** and **`Arpasing 0.2.0`** 
   - CV Fallback: `[c v]` or `[CV]`
   - VV Fallback: `(Fallbacks to [V C][C V]/[CV] then [C V]/[CV] then finally [V])`
   - Connecting VC Fallback: `[v c]`
+  - Connecting CC: `[c c]` (with consonant fallbacks) then `[c1 -]` `[- c2]`
+  - Starting and Ending Consonants
  - - - -
 ### Phonemizer Demo
 - **English**
