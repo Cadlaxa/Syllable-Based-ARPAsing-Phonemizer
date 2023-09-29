@@ -21,7 +21,8 @@ namespace OpenUtau.Plugin.Builtin {
         "aal", "al", "axl", "ael", "ahl", "aol", "ol", "awl", "aul", "ayl", "ail", "ehl", "el", "eyl", "eil", "ihl", "iyl", "il", "owl", "oul", "oyl", "oil", "uhl", "uwl", "ul",
         "naan", "an", "axn", "aen", "ahn", "aon", "on", "awn", "aun", "ayn", "ain", "ehn", "en", "eyn", "ein", "ihn", "iyn", "in", "own", "oun", "oyn", "oin", "uhn", "uwn", "un",
         "aang", "ang", "axng", "aeng", "ahng", "aong", "ong", "awng", "aung", "ayng", "aing", "ehng", "eng", "eyng", "eing", "ihng", "iyng", "ing", "owng", "oung", "oyng", "oing", "uhng", "uwng", "ung",
-        "aam", "am", "axm", "aem", "ahm", "aom", "om", "awm", "aum", "aym", "aim", "ehm", "em", "eym", "eim", "ihm", "iym", "im", "owm", "oum", "oym", "oim", "uhm", "uwm", "um",
+        "aam", "am", "axm", "aem", "ahm", "aom", "om", "awm", "aum", "aym", "aim", "ehm", "em", "eym", "eim", "ihm", "iym", "im", "owm", "oum", "oym", "oim", "uhm", "uwm", "um", "oh",
+        "eu", "oe", "yw", 
         };
         private readonly string[] consonants = "b,ch,d,dh,dr,dx,f,g,hh,jh,k,l,m,n,ng,p,q,r,s,sh,t,th,tr,v,w,y,z,zh".Split(',');
         private readonly string[] affricates = "ch,jh,j".Split(',');
@@ -50,7 +51,7 @@ namespace OpenUtau.Plugin.Builtin {
         private bool isMissingVPhonemes = false;
 
         // For banks with missing custom consonants
-        private readonly Dictionary<string, string> missingCphonemes = "by=b,dy=d,fy=f,gy=g,hy=hh,jy=jh,ky=k,ly=l,my=m,py=p,ry=r,sy=s,ty=t,vy=v,zy=z,bw=b,chw=ch,dw=d,fw=f,gw=g,hw=hh,jw=jh,kw=k,lw=l,mw=m,nw=n,pw=p,rw=r,sw=s,tw=t,vw=v,zw=w,ts=t,nx=n,cl=q,wh=w,dx=d,zh=sh,dh=d,z=s".Split(',')
+        private readonly Dictionary<string, string> missingCphonemes = "by=b,dy=d,fy=f,gy=g,hy=hh,jy=jh,ky=k,ly=l,my=m,py=p,ry=r,sy=s,ty=t,vy=v,zy=z,bw=b,chw=ch,dw=d,fw=f,gw=g,hw=hh,jw=jh,kw=k,lw=l,mw=m,nw=n,pw=p,rw=r,sw=s,tw=t,vw=v,zw=w,ts=t,nx=n,cl=q,wh=w,dx=d,zh=sh,z=s".Split(',')
                 .Select(entry => entry.Split('='))
                 .Where(parts => parts.Length == 2)
                 .Where(parts => parts[0] != parts[1])
@@ -64,6 +65,14 @@ namespace OpenUtau.Plugin.Builtin {
                 .Where(parts => parts[0] != parts[1])
                 .ToDictionary(parts => parts[0], parts => parts[1]);
         private bool isTimitPhonemes = false;
+
+        // other ARPAbet
+        private readonly Dictionary<string, string> otherArpaphonemes = "oh=ao,eu=uh,oe=ax,uy=uw,yw=uw".Split(',')
+                .Select(entry => entry.Split('='))
+                .Where(parts => parts.Length == 2)
+                .Where(parts => parts[0] != parts[1])
+                .ToDictionary(parts => parts[0], parts => parts[1]);
+        private bool isOtherArpaPhonemes = false;
 
         private readonly Dictionary<string, string> vvExceptions =
             new Dictionary<string, string>() {
@@ -99,6 +108,7 @@ namespace OpenUtau.Plugin.Builtin {
             // SPLITS UP DR AND TR
             string[] tr = new[] { "tr" };
             string[] dr = new[] { "dr" };
+            string[] wh = new[] { "wh" };
             string[] c_wy = new[] {
                                     "by", "dy", "fy", "gy", "hy", "jy", "ky", "ly", "my", "py", "ry", "sy", "ty", "vy", "zy",
                                     "bw", "chw", "dw", "fw", "gw", "hw", "jw", "kw", "lw", "mw", "nw", "pw", "rw", "sw", "tw", "vw", "zw",
@@ -130,6 +140,8 @@ namespace OpenUtau.Plugin.Builtin {
                     modified.AddRange(new string[] { "jh", s[1].ToString() });
                 } else if (tr.Contains(s) && !HasOto($"{s} {vowels}", note.tone) && !HasOto($"ay {s}", note.tone)) {
                     modified.AddRange(new string[] { "ch", s[1].ToString() });
+                } else if (wh.Contains(s) && !HasOto($"{s} {vowels}", note.tone) && !HasOto($"ay {s}", note.tone)) {
+                    modified.AddRange(new string[] { "hh", s[1].ToString() });
                 } else if (c_wy.Contains(s) && !HasOto($"{s} {vowels}", note.tone) && !HasOto($"ay {s}", note.tone)) {
                     modified.AddRange(new string[] { s[0].ToString(), s[1].ToString() });
                 } else if (av_c.Contains(s) && !HasOto($"b {s}", note.tone) && !HasOto(ValidateAlias(s), note.tone)) {
@@ -151,20 +163,10 @@ namespace OpenUtau.Plugin.Builtin {
                 }
             }
             return modified.ToArray();
-
         }
 
         protected override IG2p LoadBaseDictionary() {
             var g2ps = new List<IG2p>();
-
-            // LOAD DICTIONARY FROM FOLDER
-            string path = Path.Combine(PluginDir, "arpasing.yaml");
-            if (!File.Exists(path)) {
-                Directory.CreateDirectory(PluginDir);
-                File.WriteAllBytes(path, Data.Resources.arpasing_template);
-            }
-            g2ps.Add(G2pDictionary.NewBuilder().Load(File.ReadAllText(path)).Build());
-
             // LOAD DICTIONARY FROM SINGER FOLDER
             if (singer != null && singer.Found && singer.Loaded) {
                 string file = Path.Combine(singer.Location, "arpasing.yaml");
@@ -176,6 +178,13 @@ namespace OpenUtau.Plugin.Builtin {
                     }
                 }
             }
+            // LOAD DICTIONARY FROM FOLDER
+            string path = Path.Combine(PluginDir, "arpasing.yaml");
+            if (!File.Exists(path)) {
+                Directory.CreateDirectory(PluginDir);
+                File.WriteAllBytes(path, Data.Resources.arpasing_template);
+            }
+            g2ps.Add(G2pDictionary.NewBuilder().Load(File.ReadAllText(path)).Build());
             g2ps.Add(new ArpabetG2p());
             return new G2pFallbacks(g2ps.ToArray());
         }
@@ -188,7 +197,6 @@ namespace OpenUtau.Plugin.Builtin {
             var phonemes = new List<string>();
             var lastC = cc.Length - 1;
             var firstC = 0;
-
 
             if (!HasOto("ax", syllable.tone)) {
                 isMissingVPhonemes = true;
@@ -362,6 +370,14 @@ namespace OpenUtau.Plugin.Builtin {
                         if (!HasOto(cc1, syllable.tone)) {
                             cc1 = ValidateAlias(cc1);
                         }
+                        if (!HasOto(cc1, syllable.tone) && !HasOto($"{cc[i]} {cc[i + 1]}", syllable.tone)) {
+                            // [C1 -] [- C2]
+                            cc1 = $"- {cc[i + 1]}";
+                            phonemes.Add($"{cc[i]} -");
+                        }
+                        if (!HasOto(cc1, syllable.tone)) {
+                            cc1 = ValidateAlias(cc1);
+                        }
                         if (HasOto(crv, syllable.vowelTone)) {
                             basePhoneme = crv;
                         }
@@ -404,6 +420,8 @@ namespace OpenUtau.Plugin.Builtin {
             //CV (IF CV HAS NO C AND V FALLBACK)
             if (alias == "ng ae") {
                 return alias.Replace("ng", "n");
+            } else if (alias == "ng ao") {
+                return alias.Replace("ao", "ow");
             } else if (alias == "ch ao") {
                 return alias.Replace("ch ao", "sh ow");
             } else if (alias == "dh ao") {
@@ -490,30 +508,34 @@ namespace OpenUtau.Plugin.Builtin {
                 return alias.Replace("z", "s");
             } else if (alias == "zh aa") {
                 return alias.Replace("zh", "sh");
+            } else if (alias == "zh ao") {
+                return alias.Replace("zh", "sh");
             } else if (alias == "zh ae") {
                 return alias.Replace("zh ae", "sh ah");
             } else if (alias == "ng oy") {
                 return alias.Replace("oy", "ow");
             } else if (alias == "sh ao") {
                 return alias.Replace("ao", "ow");
+            } else if (alias == "z uh") {
+                return alias.Replace("z uh", "s uw");
             }
 
             // VALIDATE ALIAS DEPENDING ON METHOD
-            if (isMissingVPhonemes || isMissingCPhonemes || isTimitPhonemes) {
-                foreach (var syllable in missingVphonemes.Concat(missingCphonemes).Concat(timitphonemes)
-                    ) {
+            if (isMissingVPhonemes || isMissingCPhonemes || isTimitPhonemes || isOtherArpaPhonemes) {
+                foreach (var syllable in missingVphonemes.Concat(missingCphonemes).Concat(timitphonemes
+                    .Concat(otherArpaphonemes))) {
                     alias = alias.Replace(syllable.Key, syllable.Value);
                 }
             }
 
             var replacements = new Dictionary<string, string[]> {
-                { "ao", new[] { "ow" } },
-                { "oy", new[] { "ow" } },
-                { "aw", new[] { "ah" } },
-                { "ay", new[] { "ah" } },
-                { "eh", new[] { "ae" } },
-                { "ey", new[] { "eh" } },
-                { "ow", new[] { "ao" } }
+                    { "ao", new[] { "ow" } },
+                    { "oy", new[] { "ow" } },
+                    { "aw", new[] { "ah" } },
+                    { "ay", new[] { "ah" } },
+                    { "eh", new[] { "ae" } },
+                    { "ey", new[] { "eh" } },
+                    { "ow", new[] { "ao" } }
             };
             foreach (var kvp in replacements) {
                 var v1 = kvp.Key;
@@ -535,6 +557,7 @@ namespace OpenUtau.Plugin.Builtin {
             { "ay oy", new List<string> { "y ow" } },
             //ey
             { "ey aw", new List<string> { "y ae" } },
+            { "eh ey", new List<string> { "y eh" } },
             { "ey ax", new List<string> { "y ah" } },
             { "ey ay", new List<string> { "y ah" } },
             { "ey ey", new List<string> { "iy ey" } },
@@ -846,7 +869,7 @@ namespace OpenUtau.Plugin.Builtin {
                 alias = alias.Replace(VC, "eh t");
             }
             foreach (var VC in new[] { "eh y" }) {
-                alias = alias.Replace(VC, "ae y");
+                alias = alias.Replace(VC, "ey");
             }
             foreach (var VC in new[] { "eh tr" }) {
                 alias = alias.Replace(VC, "eh t");
@@ -1008,9 +1031,6 @@ namespace OpenUtau.Plugin.Builtin {
             if (alias == "b ng") {
                 return alias.Replace("b ng", "ng");
             }
-            if (alias == "b v") {
-                return alias.Replace("b v", "b -");
-            }
             if (alias == "b tr") {
                 return alias.Replace("b tr", "d t");
             }
@@ -1034,9 +1054,6 @@ namespace OpenUtau.Plugin.Builtin {
             }
             if (alias == "ch l") {
                 return alias.Replace("ch", "s");
-            }
-            if (alias == "ch m") {
-                return alias.Replace("ch m", "ch -");
             }
             if (alias == "ch n") {
                 return alias.Replace("ch", "s");
@@ -1085,9 +1102,6 @@ namespace OpenUtau.Plugin.Builtin {
             if (alias == "d ng") {
                 return alias.Replace("ng", "n");
             }
-            if (alias == "d v") {
-                return alias.Replace("d v", "d -");
-            }
             if (alias == "d th") {
                 return alias.Replace("d th", "t th");
             }
@@ -1115,9 +1129,6 @@ namespace OpenUtau.Plugin.Builtin {
             if (alias == "dh ng") {
                 return alias.Replace("dh ng", "d n");
             }
-            if (alias == "dh v") {
-                return alias.Replace("dh v", "dh -");
-            }
             if (alias == "dh tr") {
                 return alias.Replace("dh tr", "d t");
             }
@@ -1144,9 +1155,6 @@ namespace OpenUtau.Plugin.Builtin {
             }
             if (alias == "dx ng") {
                 return alias.Replace("dx ng", "d n");
-            }
-            if (alias == "dx v") {
-                return alias.Replace("dx v", "d -");
             }
             if (alias == "dx tr") {
                 return alias.Replace("dx tr", "d t");
@@ -1754,7 +1762,7 @@ namespace OpenUtau.Plugin.Builtin {
                 return alias.Replace("w", "uw");
             }
             if (alias == "w t") {
-                return alias.Replace("w ", "uw");
+                return alias.Replace("w", "uw");
             }
             if (alias == "w th") {
                 return alias.Replace("w", "uw");
@@ -1842,7 +1850,7 @@ namespace OpenUtau.Plugin.Builtin {
                 return alias.Replace("y", "iy");
             }
             if (alias == "y t") {
-                return alias.Replace("y ", "iy");
+                return alias.Replace("y", "iy");
             }
             if (alias == "y th") {
                 return alias.Replace("y", "iy");
@@ -2070,11 +2078,6 @@ namespace OpenUtau.Plugin.Builtin {
                 }
             }
             //CC's FRONT
-            foreach (var c1 in new[] { "th" }) {
-                foreach (var c2 in consonants) {
-                    alias = alias.Replace(c1 + " " + c2, "-" + " " + c2);
-                }
-            }
             foreach (var c1 in new[] { "f", "z", "hh" }) {
                 foreach (var c2 in consonants) {
                     alias = alias.Replace(c1 + " " + c2, "s" + " " + c2);
