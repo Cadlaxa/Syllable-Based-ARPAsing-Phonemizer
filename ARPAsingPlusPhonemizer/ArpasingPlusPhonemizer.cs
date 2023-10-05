@@ -51,7 +51,7 @@ namespace OpenUtau.Plugin.Builtin {
         private bool isMissingVPhonemes = false;
 
         // For banks with missing custom consonants
-        private readonly Dictionary<string, string> missingCphonemes = "by=b,dy=d,fy=f,gy=g,hy=hh,jy=jh,ky=k,ly=l,my=m,py=p,ry=r,sy=s,ty=t,vy=v,zy=z,bw=b,chw=ch,dw=d,fw=f,gw=g,hw=hh,jw=jh,kw=k,lw=l,mw=m,nw=n,pw=p,rw=r,sw=s,tw=t,vw=v,zw=w,ts=t,nx=n,cl=q,wh=w,dx=d,zh=sh,z=s".Split(',')
+        private readonly Dictionary<string, string> missingCphonemes = "nx=n,cl=q,wh=w,dx=d,zh=sh,z=s".Split(',')
                 .Select(entry => entry.Split('='))
                 .Where(parts => parts.Length == 2)
                 .Where(parts => parts[0] != parts[1])
@@ -109,11 +109,9 @@ namespace OpenUtau.Plugin.Builtin {
             string[] tr = new[] { "tr" };
             string[] dr = new[] { "dr" };
             string[] wh = new[] { "wh" };
-            string[] c_wy = new[] {
-                                    "by", "dy", "fy", "gy", "hy", "jy", "ky", "ly", "my", "py", "ry", "sy", "ty", "vy", "zy",
+            string[] c_wy = new[] { "by", "dy", "fy", "gy", "hy", "jy", "ky", "ly", "my", "ny", "py", "ry", "sy", "ty", "vy", "zy",
                                     "bw", "chw", "dw", "fw", "gw", "hw", "jw", "kw", "lw", "mw", "nw", "pw", "rw", "sw", "tw", "vw", "zw",
-                                    "bl", "fl", "gl", "kl", "pl", "br", "fr", "gr", "kr", "pr"
-                                    };
+                                    "bl", "fl", "gl", "kl", "pl", "br", "fr", "gr", "kr", "pr" };
             string[] av_c = new[] { "al", "am", "an", "ang", "ar" };
             string[] ev_c = new[] { "el", "em", "en", "eng" };
             string[] iv_c = new[] { "il", "im", "in", "ing", "ir" };
@@ -136,32 +134,46 @@ namespace OpenUtau.Plugin.Builtin {
                 }
             }
             foreach (string s in original) {
-                if (dr.Contains(s) && !HasOto($"{s} {vowels}", note.tone) && !HasOto($"ay {s}", note.tone)) {
-                    modified.AddRange(new string[] { "jh", s[1].ToString() });
-                } else if (tr.Contains(s) && !HasOto($"{s} {vowels}", note.tone) && !HasOto($"ay {s}", note.tone)) {
-                    modified.AddRange(new string[] { "ch", s[1].ToString() });
-                } else if (wh.Contains(s) && !HasOto($"{s} {vowels}", note.tone) && !HasOto($"ay {s}", note.tone)) {
-                    modified.AddRange(new string[] { "hh", s[1].ToString() });
-                } else if (c_wy.Contains(s) && !HasOto($"{s} {vowels}", note.tone) && !HasOto($"ay {s}", note.tone)) {
-                    modified.AddRange(new string[] { s[0].ToString(), s[1].ToString() });
-                } else if (av_c.Contains(s) && !HasOto($"b {s}", note.tone) && !HasOto(ValidateAlias(s), note.tone)) {
-                    modified.AddRange(new string[] { "aa", s[1].ToString() });
-                } else if (ev_c.Contains(s) && !HasOto($"b {s}", note.tone) && !HasOto(ValidateAlias(s), note.tone)) {
-                    modified.AddRange(new string[] { "eh", s[1].ToString() });
-                } else if (iv_c.Contains(s) && !HasOto($"b {s}", note.tone) && !HasOto(ValidateAlias(s), note.tone)) {
-                    modified.AddRange(new string[] { "iy", s[1].ToString() });
-                } else if (ov_c.Contains(s) && !HasOto($"b {s}", note.tone) && !HasOto(ValidateAlias(s), note.tone)) {
-                    modified.AddRange(new string[] { "ao", s[1].ToString() });
-                } else if (uv_c.Contains(s) && !HasOto($"b {s}", note.tone) && !HasOto(ValidateAlias(s), note.tone)) {
-                    modified.AddRange(new string[] { "uw", s[1].ToString() });
-                } else if (vowel3S.Contains(s) && !HasOto($"b {s}", note.tone) && !HasOto(ValidateAlias(s), note.tone)) {
-                    modified.AddRange(new string[] { s.Substring(0, 2), s[2].ToString() });
-                } else if (vowel4S.Contains(s) && !HasOto($"b {s}", note.tone) && !HasOto(ValidateAlias(s), note.tone)) {
-                    modified.AddRange(new string[] { s.Substring(0, 2), s.Substring(2, 2) });
-                } else {
-                    modified.Add(s);
+                switch (s) {
+                    case var str when dr.Contains(str) && !HasOto($"{str} {vowels}", note.tone) && !HasOto($"ay {str}", note.tone):
+                        modified.AddRange(new string[] { "jh", s[1].ToString() });
+                        break;
+                    case var str when tr.Contains(str) && !HasOto($"{str} {vowels}", note.tone) && !HasOto($"ay {str}", note.tone):
+                        modified.AddRange(new string[] { "ch", s[1].ToString() });
+                        break;
+                    case var str when wh.Contains(str) && !HasOto($"{str} {vowels}", note.tone) && !HasOto($"ay {str}", note.tone):
+                        modified.AddRange(new string[] { "hh", s[1].ToString() });
+                        break;
+                    case var str when c_wy.Contains(str) && !HasOto($"{str} {vowels}", note.tone) && !HasOto($"{str}", note.tone):
+                        modified.AddRange(new string[] { s[0].ToString(), s[1].ToString() });
+                        break;
+                    case var str when av_c.Contains(str) && !HasOto($"b {str}", note.tone) && !HasOto(ValidateAlias(str), note.tone):
+                        modified.AddRange(new string[] { "aa", s[1].ToString() });
+                        break;
+                    case var str when ev_c.Contains(str) && !HasOto($"b {str}", note.tone) && !HasOto(ValidateAlias(str), note.tone):
+                        modified.AddRange(new string[] { "eh", s[1].ToString() });
+                        break;
+                    case var str when iv_c.Contains(str) && !HasOto($"b {str}", note.tone) && !HasOto(ValidateAlias(str), note.tone):
+                        modified.AddRange(new string[] { "iy", s[1].ToString() });
+                        break;
+                    case var str when ov_c.Contains(str) && !HasOto($"b {str}", note.tone) && !HasOto(ValidateAlias(str), note.tone):
+                        modified.AddRange(new string[] { "ao", s[1].ToString() });
+                        break;
+                    case var str when uv_c.Contains(str) && !HasOto($"b {str}", note.tone) && !HasOto(ValidateAlias(str), note.tone):
+                        modified.AddRange(new string[] { "uw", s[1].ToString() });
+                        break;
+                    case var str when vowel3S.Contains(str) && !HasOto($"b {str}", note.tone) && !HasOto(ValidateAlias(str), note.tone):
+                        modified.AddRange(new string[] { s.Substring(0, 2), s[2].ToString() });
+                        break;
+                    case var str when vowel4S.Contains(str) && !HasOto($"b {str}", note.tone) && !HasOto(ValidateAlias(str), note.tone):
+                        modified.AddRange(new string[] { s.Substring(0, 2), s.Substring(2, 2) });
+                        break;
+                    default:
+                        modified.Add(s);
+                        break;
                 }
             }
+
             return modified.ToArray();
         }
 
@@ -275,52 +287,150 @@ namespace OpenUtau.Plugin.Builtin {
                 var rcv1 = $"- {cc[0]}{v}";
                 var crv = $"{cc[0]} {v}";
                 var cv = $"{cc[0]}{v}";
-                if (HasOto(rcv, syllable.vowelTone) || HasOto(ValidateAlias(rcv), syllable.vowelTone)) {
-                    basePhoneme = rcv;
-                } else if (!HasOto(rcv, syllable.vowelTone) && HasOto(rcv1, syllable.vowelTone)) {
-                    basePhoneme = rcv1;
-                } else if (!HasOto(rcv, syllable.vowelTone) && HasOto(crv, syllable.vowelTone) && HasOto(ValidateAlias(crv), syllable.vowelTone) && !HasOto(rcv1, syllable.vowelTone)) {
-                    basePhoneme = crv;
-                    TryAddPhoneme(phonemes, syllable.tone, $"- {cc[0]}", ValidateAlias($"- {cc[0]}"));
-                } else if (!HasOto(rcv, syllable.vowelTone) && !HasOto(rcv1, syllable.vowelTone) && HasOto(cv, syllable.vowelTone) && HasOto(ValidateAlias(cv), syllable.vowelTone)) {
-                    basePhoneme = cv;
-                    TryAddPhoneme(phonemes, syllable.tone, $"- {cc[0]}", ValidateAlias($"- {cc[0]}"));
-                } else {
-                    basePhoneme = crv;
-                    TryAddPhoneme(phonemes, syllable.tone, $"- {cc[0]}", ValidateAlias($"- {cc[0]}"));
+                switch (true) {
+                    case bool otoCondition1 when HasOto(rcv, syllable.vowelTone) || HasOto(ValidateAlias(rcv), syllable.vowelTone):
+                        basePhoneme = rcv;
+                        break;
+                    case bool otoCondition2 when !HasOto(rcv, syllable.vowelTone) && HasOto(rcv1, syllable.vowelTone):
+                        basePhoneme = rcv1;
+                        break;
+                    case bool otoCondition3 when !HasOto(rcv, syllable.vowelTone) && HasOto(crv, syllable.vowelTone) && HasOto(ValidateAlias(crv), syllable.vowelTone) && !HasOto(rcv1, syllable.vowelTone):
+                        basePhoneme = crv;
+                        TryAddPhoneme(phonemes, syllable.tone, $"- {cc[0]}", ValidateAlias($"- {cc[0]}"));
+                        break;
+                    case bool otoCondition4 when !HasOto(rcv, syllable.vowelTone) && !HasOto(rcv1, syllable.vowelTone) && HasOto(cv, syllable.vowelTone) && HasOto(ValidateAlias(cv), syllable.vowelTone):
+                        basePhoneme = cv;
+                        TryAddPhoneme(phonemes, syllable.tone, $"- {cc[0]}", ValidateAlias($"- {cc[0]}"));
+                        break;
+                    default:
+                        basePhoneme = crv;
+                        TryAddPhoneme(phonemes, syllable.tone, $"- {cc[0]}", ValidateAlias($"- {cc[0]}"));
+                        break;
                 }
+
             // CC V or CCV
             } else if (syllable.IsStartingCVWithMoreThanOneConsonant) {
                 var RC = $"- {cc[0]}";
                 phonemes.Add(RC);
                 if (cc.Length > 2) {
                     for (int i = 1; i < cc.Length - 1; i++) {
-                        
+
                     }
                 }
                 basePhoneme = $"{cc.Last()} {v}";
                 var crv = $"{cc.Last()} {v}";
                 var cv = $"{cc.Last()}{v}";
-                if (HasOto(crv, syllable.vowelTone) && HasOto(basePhoneme, syllable.vowelTone) || HasOto(ValidateAlias(crv), syllable.vowelTone)) {
-                    basePhoneme = crv;
-                } else if (!HasOto(crv, syllable.vowelTone) && HasOto(cv, syllable.vowelTone)) {
-                    basePhoneme = cv;
-                } else if (!HasOto(crv, syllable.vowelTone) && !HasOto(cv, syllable.vowelTone)) {
-                    basePhoneme = v;
+                switch (true) {
+                    case bool condition1 when HasOto(crv, syllable.vowelTone) && (HasOto(basePhoneme, syllable.vowelTone) || HasOto(ValidateAlias(crv), syllable.vowelTone)):
+                        basePhoneme = crv;
+                        break;
+                    case bool condition2 when !HasOto(crv, syllable.vowelTone) && HasOto(cv, syllable.vowelTone):
+                        basePhoneme = cv;
+                        break;
+                    case bool condition3 when !HasOto(crv, syllable.vowelTone) && !HasOto(cv, syllable.vowelTone):
+                        basePhoneme = crv;
+                        break;
+                    default:
+                        basePhoneme = v;
+                        break;
                 }
+
             }
             // IS VCV
             else if (syllable.IsVCVWithOneConsonant) {
-                var vc = $"{prevV} {cc[0]}";
-                phonemes.Add(vc);
+                for (var i = lastC + 1; i >= 0; i--) {
+                    var vc = $"{prevV} {cc[0]}";
+                    var vc2 = $"{prevV}{cc[0]}";
+                    var vcc3 = $"{prevV} {string.Join("", cc.TakeWhile((_, index) => index < 3))}";
+                    var vcc2 = $"{prevV} {string.Join("", cc.TakeWhile((_, index) => index < 2))}";
+                    switch (i) {
+                        case 0:
+                            phonemes.Add(vc);
+                            break;
+                        case int _ when HasOto(vc, syllable.tone):
+                            phonemes.Add(vc);
+                            goto LoopExit;
+                        case int _ when !HasOto(vc, syllable.tone) && HasOto(vc2, syllable.tone):
+                            phonemes.Add(vc2);
+                            goto LoopExit;
+                        case int _ when !HasOto(vcc2, syllable.tone) && !HasOto(vcc3, syllable.tone):
+                            phonemes.Add(vc);
+                            goto LoopExit;
+                        default:
+                            var alternativeVC = $"{prevV} {cc[0]}";
+                            if (!HasOto(alternativeVC, syllable.tone)) {
+                                phonemes.Add(alternativeVC);
+                                goto LoopExit;
+                            }
+                            continue;
+                    }
+                }
+                LoopExit:;
+
                 basePhoneme = $"{cc[0]} {v}";
+                var crv = $"{cc[0]} {v}";
+                var cv = $"{cc[0]}{v}";
+                switch (true) {
+                    case bool condition1 when HasOto(crv, syllable.vowelTone) && (HasOto(basePhoneme, syllable.vowelTone) || HasOto(ValidateAlias(crv), syllable.vowelTone)):
+                        basePhoneme = crv;
+                        break;
+                    case bool condition2 when !HasOto(crv, syllable.vowelTone) && HasOto(cv, syllable.vowelTone):
+                        basePhoneme = cv;
+                        break;
+                    case bool condition3 when !HasOto(crv, syllable.vowelTone) && !HasOto(cv, syllable.vowelTone):
+                        basePhoneme = crv;
+                        break;
+                    default:
+                        basePhoneme = v;
+                        break;
+                }
             } else {
                 // IS VCV WITH MORE THAN ONE CONSONANT
-                var vc = $"{prevV} {cc[0]}";
-                phonemes.Add(vc);
+                for (var i = lastC + 1; i >= 0; i--) {
+                    var vc = $"{prevV} {cc[0]}";
+                    var vc2 = $"{prevV}{cc[0]}";
+                    var vcc3 = $"{prevV} {string.Join("", cc.TakeWhile((_, index) => index < 3))}";
+                    var vcc2 = $"{prevV} {string.Join("", cc.TakeWhile((_, index) => index < 2))}";
+                    switch (i) {
+                        case 0:
+                            phonemes.Add(vc);
+                            break;
+                        case int _ when HasOto(vc, syllable.tone):
+                            phonemes.Add(vc);
+                            goto LoopExit;
+                        case int _ when !HasOto(vc, syllable.tone) && HasOto(vc2, syllable.tone):
+                            phonemes.Add(vc2);
+                            goto LoopExit;
+                        case int _ when !HasOto(vcc2, syllable.tone) && !HasOto(vcc3, syllable.tone):
+                            phonemes.Add(vc);
+                            goto LoopExit;
+                        default:
+                            var alternativeVC = $"{prevV} {cc[0]}";
+                            if (!HasOto(alternativeVC, syllable.tone)) {
+                                phonemes.Add(alternativeVC);
+                                goto LoopExit;
+                            }
+                            continue;
+                    }
+                }
+                LoopExit:;
+
                 basePhoneme = $"{cc.Last()} {v}";
-                if (!HasOto(basePhoneme, syllable.tone)) {
-                    basePhoneme = $"{cc.Last()} {v}";
+                var crv = $"{cc.Last()} {v}";
+                var cv = $"{cc.Last()}{v}";
+                switch (true) {
+                    case bool condition1 when HasOto(crv, syllable.vowelTone) && (HasOto(basePhoneme, syllable.vowelTone) || HasOto(ValidateAlias(crv), syllable.vowelTone)):
+                        basePhoneme = crv;
+                        break;
+                    case bool condition2 when !HasOto(crv, syllable.vowelTone) && HasOto(cv, syllable.vowelTone):
+                        basePhoneme = cv;
+                        break;
+                    case bool condition3 when !HasOto(crv, syllable.vowelTone) && !HasOto(cv, syllable.vowelTone):
+                        basePhoneme = crv;
+                        break;
+                    default:
+                        basePhoneme = v;
+                        break;
                 }
                 for (int i = 0; i < cc.Length - 1; i++) {
                     var currentcc = $"{cc[i]} {cc[i + 1]}";
@@ -358,22 +468,14 @@ namespace OpenUtau.Plugin.Builtin {
                     }
                     if (i + 1 < lastC) {
                         var cc2 = $"{string.Join("", cc.Skip(i))}";
-                        if (!HasOto(cc1, syllable.tone)) {
+                        if (!HasOto(cc2, syllable.tone)) {
                             // [C1] [C2]
-                            cc1 = $"{cc[i]} {cc[i + 1]}";
+                            cc2 = $"{cc[i]} {cc[i + 1]}";
                             // CHECK FOR Y'S AND W'S
                             if (i + 2 < cc.Length && (cc[i] == "y" || cc[i] == "w")) {
-                                cc1 = $"{cc[i]} {cc[i + 1]} {cc[i + 2]}";
+                                cc2 = $"{cc[i]} {cc[i + 1]} {cc[i + 2]}";
                                 i += 2;
                             }
-                        }
-                        if (!HasOto(cc1, syllable.tone)) {
-                            cc1 = ValidateAlias(cc1);
-                        }
-                        if (!HasOto(cc1, syllable.tone) && !HasOto($"{cc[i]} {cc[i + 1]}", syllable.tone)) {
-                            // [C1 -] [- C2]
-                            cc1 = $"- {cc[i + 1]}";
-                            phonemes.Add($"{cc[i]} -");
                         }
                         if (!HasOto(cc1, syllable.tone)) {
                             cc1 = ValidateAlias(cc1);
@@ -557,7 +659,7 @@ namespace OpenUtau.Plugin.Builtin {
             { "ay oy", new List<string> { "y ow" } },
             //ey
             { "ey aw", new List<string> { "y ae" } },
-            { "eh ey", new List<string> { "y eh" } },
+            { "ey eh", new List<string> { "y eh" } },
             { "ey ax", new List<string> { "y ah" } },
             { "ey ay", new List<string> { "y ah" } },
             { "ey ey", new List<string> { "iy ey" } },
@@ -708,6 +810,9 @@ namespace OpenUtau.Plugin.Builtin {
                 return alias.Replace("tr", "t");
             }
             //VC (oy specific)
+            if (alias == "- oy") {
+                return alias.Replace("oy", "ow");
+            }
             if (alias == "oy dx") {
                 return alias.Replace("oy dx", "iy d");
             }
@@ -721,7 +826,7 @@ namespace OpenUtau.Plugin.Builtin {
                 return alias.Replace("iy", "ih");
             }
             if (alias == "oy q") {
-                return alias.Replace("q", "t");
+                return alias.Replace("oy q", "iy t");
             }
             if (alias == "oy tr") {
                 return alias.Replace("oy tr", "iy ch");
@@ -1041,43 +1146,15 @@ namespace OpenUtau.Plugin.Builtin {
                 return alias.Replace("zh", "z");
             }
 
-
             //CC (ch specific)
-            if (alias == "ch f") {
-                return alias.Replace("ch", "s");
-            }
-            if (alias == "ch dh") {
-                return alias.Replace("dh", "-");
-            }
-            if (alias == "ch hh") {
-                return alias.Replace("ch", "s");
-            }
-            if (alias == "ch l") {
-                return alias.Replace("ch", "s");
-            }
-            if (alias == "ch n") {
-                return alias.Replace("ch", "s");
-            }
-            if (alias == "ch ng") {
-                return alias.Replace("ch ng", "s n");
-            }
             if (alias == "ch r") {
                 return alias.Replace("ch r", "ch er");
-            }
-            if (alias == "ch s") {
-                return alias.Replace("ch", "s");
-            }
-            if (alias == "ch sh") {
-                return alias.Replace("ch sh", "s s");
             }
             if (alias == "ch w") {
                 return alias.Replace("ch w", "ch ah");
             }
             if (alias == "ch y") {
                 return alias.Replace("ch y", "ch iy");
-            }
-            if (alias == "ch z") {
-                return alias.Replace("ch z", "s s");
             }
             if (alias == "ch -") {
                 return alias.Replace("ch", "jh");
@@ -1089,9 +1166,6 @@ namespace OpenUtau.Plugin.Builtin {
             //CC (d specific)
             if (alias == "d ch") {
                 return alias.Replace("d", "t");
-            }
-            if (alias == "d dh") {
-                return alias.Replace("d dh", "- dh");
             }
             if (alias == "d dr") {
                 return alias.Replace("dr", "jh");
@@ -1112,7 +1186,6 @@ namespace OpenUtau.Plugin.Builtin {
                 return alias.Replace("zh", "z");
             }
 
-            //CC (dh)
             //CC (dh specific)
             if (alias == "dh ch") {
                 return alias.Replace("dh ch", "t ch");
@@ -1122,9 +1195,6 @@ namespace OpenUtau.Plugin.Builtin {
             }
             if (alias == "dh dr") {
                 return alias.Replace("dh dr", "d jh");
-            }
-            if (alias == "dh dx") {
-                return alias.Replace("dh dx", "dh -");
             }
             if (alias == "dh ng") {
                 return alias.Replace("dh ng", "d n");
@@ -1141,17 +1211,12 @@ namespace OpenUtau.Plugin.Builtin {
             if (alias == "dh -") {
                 return alias.Replace("dh", "d");
             }
-
-            //CC (dx)
             //CC (dx specific)
             if (alias == "dx ch") {
                 return alias.Replace("dx ch", "t ch");
             }
             if (alias == "dx dr") {
                 return alias.Replace("dx dr", "d jh");
-            }
-            if (alias == "dx dx") {
-                return alias.Replace("dx dx", "d -");
             }
             if (alias == "dx ng") {
                 return alias.Replace("dx ng", "d n");
@@ -1163,31 +1228,12 @@ namespace OpenUtau.Plugin.Builtin {
                 return alias.Replace("dx zh", "d z");
             }
 
-            //CC (f)
             //CC (f specific)
             if (alias == "f dr") {
                 return alias.Replace("f dr", "s jh");
             }
-            if (alias == "f dx") {
-                return alias.Replace("f dx", "f -");
-            }
-            if (alias == "f ng") {
-                return alias.Replace("f ng", "f -");
-            }
-            if (alias == "f q") {
-                return alias.Replace("f q", "f -");
-            }
             if (alias == "f sh") {
                 return alias.Replace("sh", "s");
-            }
-            if (alias == "f th") {
-                return alias.Replace("f th", "th");
-            }
-            if (alias == "f tr") {
-                return alias.Replace("f tr", "f -");
-            }
-            if (alias == "f v") {
-                return alias.Replace("f v", "f -");
             }
             if (alias == "f w") {
                 return alias.Replace("f w", "f uw");
@@ -1202,7 +1248,6 @@ namespace OpenUtau.Plugin.Builtin {
                 return alias.Replace("f", "th");
             }
 
-            //CC (g)
             //CC (g specific)
             if (alias == "g ch") {
                 return alias.Replace("g ch", "t ch");
@@ -1219,30 +1264,19 @@ namespace OpenUtau.Plugin.Builtin {
             if (alias == "g ng") {
                 return alias.Replace("g ng", "ng");
             }
-            if (alias == "g v") {
-                return alias.Replace("g v", "g -");
-            }
             if (alias == "g tr") {
                 return alias.Replace("g tr", "d t");
             }
             if (alias == "g zh") {
                 return alias.Replace("zh", "z");
             }
-            if (alias == "- b") {
+            if (alias == "- g") {
                 return alias.Replace("g", "d");
             }
             if (alias == "g -") {
                 return alias.Replace("g", "d");
             }
-
-            //CC (hh)
             //CC (hh specific)
-            if (alias == "hh d") {
-                return alias.Replace("hh d", "th -");
-            }
-            if (alias == "hh dr") {
-                return alias.Replace("hh dr", "th -");
-            }
             if (alias == "hh dx") {
                 return alias.Replace("hh dx", "s d");
             }
@@ -1254,9 +1288,6 @@ namespace OpenUtau.Plugin.Builtin {
             }
             if (alias == "hh ng") {
                 return alias.Replace("hh ng", "s n");
-            }
-            if (alias == "hh q") {
-                return alias.Replace("hh p", "th -");
             }
             if (alias == "hh r") {
                 return alias.Replace("hh", "f");
@@ -1273,12 +1304,6 @@ namespace OpenUtau.Plugin.Builtin {
             if (alias == "hh th") {
                 return alias.Replace("hh th", "hh");
             }
-            if (alias == "hh tr") {
-                return alias.Replace("hh tr", "th -");
-            }
-            if (alias == "hh v") {
-                return alias.Replace("hh v", "th -");
-            }
             if (alias == "hh w") {
                 return alias.Replace("hh w", "hh uw");
             }
@@ -1288,9 +1313,6 @@ namespace OpenUtau.Plugin.Builtin {
             if (alias == "hh z") {
                 return alias.Replace("hh z", "s s");
             }
-            if (alias == "hh zh") {
-                return alias.Replace("hh zh", "th -");
-            }
             if (alias == "hh -") {
                 return alias.Replace("hh -", null);
             }
@@ -1298,9 +1320,6 @@ namespace OpenUtau.Plugin.Builtin {
             //CC (jh specific)
             if (alias == "jh hh") {
                 return alias.Replace("jh", "s");
-            }
-            if (alias == "jh hh") {
-                return alias.Replace("hh", "-");
             }
             if (alias == "jh l") {
                 return alias.Replace("jh", "f");
@@ -1320,32 +1339,16 @@ namespace OpenUtau.Plugin.Builtin {
             if (alias == "jh s") {
                 return alias.Replace("jh", "f");
             }
-            if (alias == "jh t") {
-                return alias.Replace("jh t", "jh -");
-            }
             if (alias == "jh w") {
                 return alias.Replace("jh w", "jh ah");
             }
             if (alias == "jh y") {
                 return alias.Replace("y", "iy");
             }
-            if (alias == "jh z") {
-                return alias.Replace("jh z", "s s");
-            }
 
-            //CC (k)
             //CC (k specific)
-            if (alias == "k dr") {
-                return alias.Replace("k dr", "k -");
-            }
             if (alias == "k dx") {
                 return alias.Replace("k dx", "t d");
-            }
-            if (alias == "k v") {
-                return alias.Replace("k v", "k -");
-            }
-            if (alias == "k tr") {
-                return alias.Replace("k tr", "k -");
             }
             if (alias == "k z") {
                 return alias.Replace("z", "s");
@@ -1360,9 +1363,6 @@ namespace OpenUtau.Plugin.Builtin {
             }
             if (alias == "l b") {
                 return alias.Replace("l", "d");
-            }
-            if (alias == "l dr") {
-                return alias.Replace("l dr", "- jh");
             }
             if (alias == "l dx") {
                 return alias.Replace("l dx", "l d");
@@ -1382,9 +1382,6 @@ namespace OpenUtau.Plugin.Builtin {
             if (alias == "l th") {
                 return alias.Replace("l th", "l s");
             }
-            if (alias == "l tr") {
-                return alias.Replace("l tr", "- ch");
-            }
             if (alias == "l zh") {
                 return alias.Replace("zh", "z");
             }
@@ -1392,9 +1389,6 @@ namespace OpenUtau.Plugin.Builtin {
             //CC (m specific)
             if (alias == "m ch") {
                 return alias.Replace("m", "n");
-            }
-            if (alias == "m dr") {
-                return alias.Replace("m dr", "- jh");
             }
             if (alias == "m dx") {
                 return alias.Replace("dx", "d");
@@ -1414,9 +1408,6 @@ namespace OpenUtau.Plugin.Builtin {
             if (alias == "m m") {
                 return alias.Replace("m m", "n");
             }
-            if (alias == "m q") {
-                return alias.Replace("m q", "m -");
-            }
             if (alias == "m r") {
                 return alias.Replace("m", "n");
             }
@@ -1429,17 +1420,11 @@ namespace OpenUtau.Plugin.Builtin {
             if (alias == "m v") {
                 return alias.Replace("m v", "m m");
             }
-            if (alias == "m tr") {
-                return alias.Replace("m tr", "- ch");
-            }
             if (alias == "m zh") {
                 return alias.Replace("zh", "z");
             }
 
             //CC (n specific)
-            if (alias == "n dr") {
-                return alias.Replace("n dr", "- jh");
-            }
             if (alias == "n dx") {
                 return alias.Replace("dx", "d");
             }
@@ -1452,14 +1437,8 @@ namespace OpenUtau.Plugin.Builtin {
             if (alias == "n m") {
                 return alias.Replace("n m", "n");
             }
-            if (alias == "n q") {
-                return alias.Replace("n q", "n -");
-            }
             if (alias == "n v") {
                 return alias.Replace("n v", "n m");
-            }
-            if (alias == "n tr") {
-                return alias.Replace("n tr", "- ch");
             }
             if (alias == "n zh") {
                 return alias.Replace("zh", "z");
@@ -1477,38 +1456,19 @@ namespace OpenUtau.Plugin.Builtin {
             if (alias == "ng ch") {
                 return alias.Replace("ch", "t");
             }
-            if (alias == "ng dr") {
-                return alias.Replace("ng dr", "- jh");
-            }
             if (alias == "ng ng") {
                 return alias.Replace("ng", "n");
             }
-            if (alias == "ng q") {
-                return alias.Replace("ng q", "ng -");
-            }
             if (alias == "ng v") {
                 return alias.Replace("ng v", "ng s");
-            }
-            if (alias == "ng tr") {
-                return alias.Replace("ng tr", "- ch");
             }
             if (alias == "ng zh") {
                 return alias.Replace("zh", "z");
             }
 
-            //CC (p)
             //CC (p specific)
-            if (alias == "p dr") {
-                return alias.Replace("t dr", "p -");
-            }
             if (alias == "p dx") {
                 return alias.Replace("p dx", "t d");
-            }
-            if (alias == "p v") {
-                return alias.Replace("p v", "p -");
-            }
-            if (alias == "p tr") {
-                return alias.Replace("t tr", "p -");
             }
             if (alias == "p z") {
                 return alias.Replace("z", "s");
@@ -1536,14 +1496,8 @@ namespace OpenUtau.Plugin.Builtin {
             if (alias == "r ng") {
                 return alias.Replace("ng", "n");
             }
-            if (alias == "r q") {
-                return alias.Replace("r q", "r -");
-            }
             if (alias == "r sh") {
                 return alias.Replace("sh", "s");
-            }
-            if (alias == "r tr") {
-                return alias.Replace("r tr", "r -");
             }
             if (alias == "r zh") {
                 return alias.Replace("zh", "z");
@@ -1562,9 +1516,6 @@ namespace OpenUtau.Plugin.Builtin {
             if (alias == "s ng") {
                 return alias.Replace("ng", "n");
             }
-            if (alias == "s q") {
-                return alias.Replace("s q", "s -");
-            }
             if (alias == "s sh") {
                 return alias.Replace("sh", "s");
             }
@@ -1574,9 +1525,6 @@ namespace OpenUtau.Plugin.Builtin {
             if (alias == "s v") {
                 return alias.Replace("s", "z");
             }
-            if (alias == "s tr") {
-                return alias.Replace("s tr", "s -");
-            }
             if (alias == "s zh") {
                 return alias.Replace("zh", "s");
             }
@@ -1584,9 +1532,6 @@ namespace OpenUtau.Plugin.Builtin {
             //CC (sh specific)
             if (alias == "sh f") {
                 return alias.Replace("sh", "s");
-            }
-            if (alias == "sh f") {
-                return alias.Replace("f", "-");
             }
             if (alias == "sh hh") {
                 return alias.Replace("sh", "s");
@@ -1635,19 +1580,9 @@ namespace OpenUtau.Plugin.Builtin {
                 return alias.Replace("t zh", "g z");
             }
 
-            //CC (th)
             //CC (th specific)
             if (alias == "th dr") {
                 return alias.Replace("th dr", "s jh");
-            }
-            if (alias == "th dx") {
-                return alias.Replace("th dx", "th -");
-            }
-            if (alias == "th q") {
-                return alias.Replace("th q", "th -");
-            }
-            if (alias == "th v") {
-                return alias.Replace("th v", "th");
             }
             if (alias == "th y") {
                 return alias.Replace("th y", "th ih");
@@ -1893,9 +1828,6 @@ namespace OpenUtau.Plugin.Builtin {
             if (alias == "z ng") {
                 return alias.Replace("ng", "n");
             }
-            if (alias == "z q") {
-                return alias.Replace("z q", "z -");
-            }
             if (alias == "z z") {
                 return alias.Replace("z z", "z s");
             }
@@ -1919,9 +1851,6 @@ namespace OpenUtau.Plugin.Builtin {
             if (alias == "zh ng") {
                 return alias.Replace("ng", "n");
             }
-            if (alias == "zh q") {
-                return alias.Replace("zh q", "jh -");
-            }
             if (alias == "zh z") {
                 return alias.Replace("zh z", "z s");
             }
@@ -1929,12 +1858,12 @@ namespace OpenUtau.Plugin.Builtin {
                 return alias.Replace("z zh", "z s");
             }
             //VC's
-            foreach (var v1 in new[] { "aw", "ow", "uh", }) {
+            foreach (var v1 in new[] { "aw", "ow", "uh" }) {
                 foreach (var c1 in consonants) {
                     alias = alias.Replace(v1 + " " + c1, "uw" + " " + c1);
                 }
             }
-            foreach (var v1 in new[] { "ay", "ey", "oy", }) {
+            foreach (var v1 in new[] { "ay", "ey", "oy" }) {
                 foreach (var c1 in consonants) {
                     alias = alias.Replace(v1 + " " + c1, "iy" + " " + c1);
                 }
@@ -1963,162 +1892,267 @@ namespace OpenUtau.Plugin.Builtin {
             // - C's
             foreach (var c1 in new[] { "d", "k", "ch", "tr" }) {
                 foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(s + " " + c1, s + " " + "t");
+                    switch (s + " " + c1) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, s + " " + "t");
+                            break;
+                    }
                 }
             }
             foreach (var c1 in new[] { "sh", "th", "zh", "z", "f", "hh" }) {
                 foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(s + " " + c1, s + " " + "s");
+                    switch (s + " " + c1) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, s + " " + "s");
+                            break;
+                    }
                 }
             }
             foreach (var c1 in new[] { "jh", "dr", "b", "g", "t", "dh", "p" }) {
                 foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(s + " " + c1, s + " " + "d");
+                    switch (s + " " + c1) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, s + " " + "d");
+                            break;
+                    }
                 }
             }
-            foreach (var c1 in new[] { "l", }) {
+            foreach (var c1 in new[] { "l" }) {
                 foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(s + " " + c1, s + " " + "n");
+                    switch (s + " " + c1) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, s + " " + "n");
+                            break;
+                    }
                 }
             }
-            foreach (var c1 in new[] { "r", }) {
+            foreach (var c1 in new[] { "r" }) {
                 foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(s + " " + c1, s + " " + "er");
+                    switch (s + " " + c1) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, s + " " + "er");
+                            break;
+                    }
                 }
             }
             foreach (var c1 in new[] { "v" }) {
                 foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(s + " " + c1, s + " " + "b");
+                    switch (s + " " + c1) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, s + " " + "b");
+                            break;
+                    }
                 }
             }
             foreach (var c1 in new[] { "w" }) {
                 foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(s + " " + c1, s + " " + "uw");
+                    switch (s + " " + c1) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, s + " " + "uw");
+                            break;
+                    }
                 }
             }
             foreach (var c1 in new[] { "y" }) {
                 foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(s + " " + c1, s + " " + "iy");
+                    switch (s + " " + c1) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, s + " " + "iy");
+                            break;
+                    }
                 }
             }
             foreach (var c1 in new[] { "m", "n", "ng" }) {
                 foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(s + " " + c1, s + " " + "n");
+                    switch (s + " " + c1) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, s + " " + "n");
+                            break;
+                    }
                 }
             }
             // C -'s
             foreach (var c1 in new[] { "d", "dh", "g", "p" }) {
                 foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(c1 + " " + s, "b" + " " + s);
+                    switch (c1 + " " + s) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, "b" + " " + s);
+                            break;
+                    }
                 }
             }
             foreach (var c1 in new[] { "jh" }) {
                 foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(c1 + " " + s, "ch" + " " + s);
+                    switch (c1 + " " + s) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, "ch" + " " + s);
+                            break;
+                    }
                 }
             }
             foreach (var c1 in new[] { "b" }) {
                 foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(c1 + " " + s, "d" + " " + s);
-                }
-            }
-            foreach (var c1 in new[] { "hh", "s" }) {
-                foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(c1 + " " + s, "f" + " " + s);
-                }
-            }
-            foreach (var c1 in new[] { "ch" }) {
-                foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(c1 + " " + s, "jh" + " " + s);
-                }
-            }
-            foreach (var c1 in new[] { "t" }) {
-                foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(c1 + " " + s, "k" + " " + s);
-                }
-            }
-            foreach (var c1 in new[] { "r" }) {
-                foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(c1 + " " + s, "er" + " " + s);
-                }
-            }
-            foreach (var c1 in new[] { "n" }) {
-                foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(c1 + " " + s, "m" + " " + s);
-                }
-            }
-            foreach (var c1 in new[] { "l" }) {
-                foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(c1 + " " + s, "r" + " " + s);
-                }
-            }
-            foreach (var c1 in new[] { "ng", "m" }) {
-                foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(c1 + " " + s, "n" + " " + s);
-                }
-            }
-            foreach (var c1 in new[] { "sh", "zh", "th", "z", "f" }) {
-                foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(c1 + " " + s, "s" + " " + s);
-                }
-            }
-            foreach (var c1 in new[] { "k" }) {
-                foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(c1 + " " + s, "t" + " " + s);
+                    switch (c1 + " " + s) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, "d" + " " + s);
+                            break;
+                    }
                 }
             }
             foreach (var c1 in new[] { "s" }) {
                 foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(c1 + " " + s, "z" + " " + s);
+                    switch (c1 + " " + s) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, "f" + " " + s);
+                            break;
+                    }
+                }
+            }
+            foreach (var c1 in new[] { "ch" }) {
+                foreach (var s in new[] { "-" }) {
+                    switch (c1 + " " + s) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, "jh" + " " + s);
+                            break;
+                    }
+                }
+            }
+            foreach (var c1 in new[] { "t" }) {
+                foreach (var s in new[] { "-" }) {
+                    switch (c1 + " " + s) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, "k" + " " + s);
+                            break;
+                    }
+                }
+            }
+            foreach (var c1 in new[] { "r" }) {
+                foreach (var s in new[] { "-" }) {
+                    switch (c1 + " " + s) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, "er" + " " + s);
+                            break;
+                    }
+                }
+            }
+            foreach (var c1 in new[] { "n" }) {
+                foreach (var s in new[] { "-" }) {
+                    switch (c1 + " " + s) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, "m" + " " + s);
+                            break;
+                    }
+                }
+            }
+            foreach (var c1 in new[] { "l" }) {
+                foreach (var s in new[] { "-" }) {
+                    switch (c1 + " " + s) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, "r" + " " + s);
+                            break;
+                    }
+                }
+            }
+            foreach (var c1 in new[] { "ng", "m" }) {
+                foreach (var s in new[] { "-" }) {
+                    switch (c1 + " " + s) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, "n" + " " + s);
+                            break;
+                    }
+                }
+            }
+            foreach (var c1 in new[] { "sh", "zh", "th", "z", "f" }) {
+                foreach (var s in new[] { "-" }) {
+                    switch (c1 + " " + s) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, "s" + " " + s);
+                            break;
+                    }
+                }
+            }
+            foreach (var c1 in new[] { "k" }) {
+                foreach (var s in new[] { "-" }) {
+                    switch (c1 + " " + s) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, "t" + " " + s);
+                            break;
+                    }
+                }
+            }
+            foreach (var c1 in new[] { "s" }) {
+                foreach (var s in new[] { "-" }) {
+                    switch (c1 + " " + s) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, "z" + " " + s);
+                            break;
+                    }
                 }
             }
             foreach (var c1 in new[] { "hh" }) {
                 foreach (var s in new[] { "-" }) {
-                    alias = alias.Replace(c1 + " " + s, null);
+                    switch (c1 + " " + s) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, null);
+                            break;
+                    }
                 }
             }
-            //CC's FRONT
+            // CC's
             foreach (var c1 in new[] { "f", "z", "hh" }) {
                 foreach (var c2 in consonants) {
-                    alias = alias.Replace(c1 + " " + c2, "s" + " " + c2);
+                    switch (c1 + " " + c2) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, "s" + " " + c2);
+                            break;
+                    }
                 }
             }
             foreach (var c1 in new[] { "k", "p", "d" }) {
                 foreach (var c2 in consonants) {
-                    alias = alias.Replace(c1 + " " + c2, "t" + " " + c2);
+                    switch (c1 + " " + c2) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, "t" + " " + c2);
+                            break;
+                    }
                 }
             }
             foreach (var c1 in new[] { "dh", "g", "b" }) {
                 foreach (var c2 in consonants) {
-                    alias = alias.Replace(c1 + " " + c2, "d" + " " + c2);
+                    switch (c1 + " " + c2) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, "d" + " " + c2);
+                            break;
+                    }
                 }
             }
             foreach (var c1 in new[] { "l" }) {
                 foreach (var c2 in consonants) {
-                    alias = alias.Replace(c1 + " " + c2, "r" + " " + c2);
+                    switch (c1 + " " + c2) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, "r" + " " + c2);
+                            break;
+                    }
                 }
             }
             foreach (var c1 in new[] { "m" }) {
                 foreach (var c2 in consonants) {
-                    alias = alias.Replace(c1 + " " + c2, "n" + " " + c2);
+                    switch (c1 + " " + c2) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, "n" + " " + c2);
+                            break;
+                    }
                 }
             }
             foreach (var c1 in new[] { "r" }) {
                 foreach (var c2 in consonants) {
-                    alias = alias.Replace(c1 + " " + c2, "er" + " " + c2);
+                    switch (c2 + " " + c1) {
+                        case var str when alias.Contains(str):
+                            alias = alias.Replace(str, c2 + " " + "er");
+                            break;
+                    }
                 }
             }
-            foreach (var c1 in new[] { "s", "zh" }) {
-                foreach (var c2 in consonants) {
-                    alias = alias.Replace(c1 + " " + c2, "z" + " " + c2);
-                }
-            }
-            foreach (var c1 in new[] { "r" }) {
-                foreach (var c2 in consonants) {
-                    alias = alias.Replace(c2 + " " + c1, c2 + " " + "er");
-                }
-            }
-
             return base.ValidateAlias(alias);
 
         }
