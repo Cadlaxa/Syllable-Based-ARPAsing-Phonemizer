@@ -27,9 +27,9 @@ As of version **`V0.0.55`** and above, it now supports the majority of all ARPAs
   - Starting C: `[- c]`
   - Starting CV: `[- c v]` or `[- cv]`
   - Starting V: `[- v]` or `[v]`
-  - VV: `(Fallbacks to [V C][C V]/[CV] then [C V]/[CV] then finally [V])`
-  - Connecting CV: `[c v]` (Fallbacks to `[CV]`if no alias is detected)
-  - Connecting VC: `[v c]`
+  - VV: `(Fallbacks to [v c][c v]/[cv] then [c v]/[cv] then finally [v])`
+  - Connecting CV: `[c v]` (Fallbacks to `[cv]`if no alias is detected)
+  - Connecting VC: `[v c]` then `[v -]` `[- c`
   - Connecting CC: `[c c]` (with consonant fallbacks) then `[c1 -]` `[- c2]`
   - Ending C: `[c -]`
   - Ending V: `[v -]`
@@ -46,9 +46,9 @@ As of version **`V0.0.55`** and above, it now supports the majority of all ARPAs
  - - - -
 ### Vowel and Consonant Fallbacks
 - **This custom Phonemizer supports vowel and consonant fallbacks:**
-  - CV Fallback: `[c v]` or `[CV]`
-  - VV Fallback: `(Fallbacks to [V C][C V]/[CV] then [C V]/[CV] then finally [V])`
-  - Connecting VC Fallback: `[v c]`
+  - CV Fallback: `[c v]` or `[cv]`
+  - VV Fallback: `(Fallbacks to [v c][c v]/[cv] then [c v]/[cv] then finally [v])`
+  - Connecting VC Fallback: `[v c]` then `[v -]` `[- c]`
   - Connecting CC: `[c c]` (with consonant fallbacks) then `[c1 -]` `[- c2]`
   - Starting and Ending Consonants
  - - - -
