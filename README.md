@@ -53,13 +53,21 @@ As of version **`V0.0.55`** and above, it now supports the majority of all ARPAs
   - Starting and Ending Consonants
  - - - -
 ### Phonemizer Demo
+- **Consonant Timing Difference**
+  - **Vocal: Arpa_test**
+  - `EN ARPA`: **consonant timings are constant to 0.5 ms**
+    
+https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/assets/92255161/9b6556c8-3c80-4a9d-8b83-c44432abdc8b
+  - `EN ARPA+`: **consonant timings changes depending on the consonant**
+    
+https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/assets/92255161/0fbf752b-3265-443b-95c2-a1beb34d331e
 - **English**
-  - **Vocal: KYE by @Winter_drivE**
+  - **Vocal: Arpa_test**
   - `EN ARPA`:
     
      https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/assets/92255161/ee107d2b-16b5-4847-abab-79d676a261be
   - `EN ARPA+`:
-  - 
+    
     https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/assets/92255161/0ef5a490-d522-4434-90c7-cec71778dc65
 - **Chinese (with dictionary)**
   - **Vocal: LIEE ENGLISH by @utauraptor**
