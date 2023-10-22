@@ -778,332 +778,537 @@ namespace OpenUtau.Plugin.Builtin {
 
             }
 
-            // VC (aa)
+            //VC (aa)
+            //VC (aa specific)
             if (alias == "aa b") {
-                alias = alias.Replace(alias, "aa d");
-            } else if (alias == "aa q") {
-                alias = alias.Replace(alias, "aa t");
-            } else if (alias == "aa y") {
-                alias = alias.Replace(alias, "ah iy");
-            } else if (alias == "aa zh") {
-                alias = alias.Replace(alias, "aa z");
+                return alias.Replace("aa b", "aa d");
+            }
+            if (alias == "aa dr") {
+                return alias.Replace("aa dr", "aa d");
+            }
+            if (alias == "aa dx") {
+                return alias.Replace("aa dx", "aa d");
+            }
+            if (alias == "aa q") {
+                return alias.Replace("aa q", "aa t");
+            }
+            if (alias == "aa tr") {
+                return alias.Replace("aa tr", "aa t");
+            }
+            if (alias == "aa y") {
+                return alias.Replace("aa y", "ah iy");
+            }
+            if (alias == "aa zh") {
+                return alias.Replace("aa zh", "aa z");
             }
 
-            // alias (ae specific)
-              else if (alias == "ae b") {
-                alias = alias.Replace(alias, "ah d");
-            } else if (alias == "ae q") {
-                alias = alias.Replace(alias, "ah t");
-            } else if (alias == "ae y") {
-                alias = alias.Replace(alias, "ah iy");
-            } else if (alias == "ae zh") {
-                alias = alias.Replace(alias, "ah z");
+            //VC (ae specific)
+            if (alias == "ae b") {
+                return alias.Replace("ae b", "ah d");
+            }
+            if (alias == "ae dr") {
+                return alias.Replace("ae dr", "ah d");
+            }
+            if (alias == "ae dx") {
+                return alias.Replace("ae dx", "ah d");
+            }
+            if (alias == "ae q") {
+                return alias.Replace("ae q", "ah t");
+            }
+            if (alias == "ae tr") {
+                return alias.Replace("ae tr", "ah t");
+            }
+            if (alias == "ae y") {
+                return alias.Replace("ae y", "ah iy");
+            }
+            if (alias == "ae zh") {
+                return alias.Replace("ae zh", "ah z");
             }
 
-            // alias (ah specific)
-            else if (alias == "ah b") {
-                alias = alias.Replace(alias, "ah d");
-            } else if (alias == "ah q") {
-                alias = alias.Replace(alias, "ah t");
-            } else if (alias == "ah y") {
-                alias = alias.Replace(alias, "ah iy");
-            } else if (alias == "ah zh") {
-                alias = alias.Replace(alias, "ah z");
+            //VC (ah specific)
+            if (alias == "ah b") {
+                return alias.Replace("ah b", "ah d");
+            }
+            if (alias == "ah dr") {
+                return alias.Replace("ah dr", "ah d");
+            }
+            if (alias == "ah dx") {
+                return alias.Replace("ah dx", "ah d");
+            }
+            if (alias == "ah q") {
+                return alias.Replace("ah q", "ah t");
+            }
+            if (alias == "ah tr") {
+                return alias.Replace("ah tr", "ah t");
+            }
+            if (alias == "ah y") {
+                return alias.Replace("ah y", "ah iy");
+            }
+            if (alias == "ah zh") {
+                return alias.Replace("ah zh", "ah z");
             }
 
-              // alias (ao)
-              // alias (ao specific)
-            else if (alias == "ao b") {
-                alias = alias.Replace(alias, "ah d");
-            } else if (alias == "ao q") {
-                alias = alias.Replace(alias, "ah t");
-            } else if (alias == "ao y") {
-                alias = alias.Replace(alias, "ow y");
-            } else if (alias == "ao zh") {
-                alias = alias.Replace(alias, "ah z");
+            //VC (ao)
+            //VC (ao specific)
+            if (alias == "ao b") {
+                return alias.Replace("ao b", "ah d");
+            }
+            if (alias == "ao dr") {
+                return alias.Replace("ao dr", "ah d");
+            }
+            if (alias == "ao dx") {
+                return alias.Replace("ao dx", "ah d");
+            }
+            if (alias == "ao q") {
+                return alias.Replace("ao q", "ah t");
+            }
+            if (alias == "ao tr") {
+                return alias.Replace("ao tr", "ah t");
+            }
+            if (alias == "ao y") {
+                return alias.Replace("ao y", "ow y");
+            }
+            if (alias == "ao zh") {
+                return alias.Replace("ao zh", "ah z");
             }
 
-              // alias (ax)
-              // alias (ax specific)
-            else if (alias == "ax b") {
-                alias = alias.Replace(alias, "ah d");
-            } else if (alias == "ax q") {
-                alias = alias.Replace(alias, "ah t");
-            } else if (alias == "ax y") {
-                alias = alias.Replace(alias, "ah iy");
-            } else if (alias == "ax zh") {
-                alias = alias.Replace(alias, "ah z");
+            //VC (ax)
+            //VC (ae specific)
+            if (alias == "ax b") {
+                return alias.Replace("ax b", "ah d");
+            }
+            if (alias == "ax dr") {
+                return alias.Replace("ax dr", "ah d");
+            }
+            if (alias == "ax dx") {
+                return alias.Replace("ax dx", "ah d");
+            }
+            if (alias == "ax q") {
+                return alias.Replace("ax q", "ah t");
+            }
+            if (alias == "ax tr") {
+                return alias.Replace("ax tr", "ah t");
+            }
+            if (alias == "ax y") {
+                return alias.Replace("ax y", "ah iy");
+            }
+            if (alias == "ax zh") {
+                return alias.Replace("ax zh", "ah z");
             }
 
-            // alias (eh)
-            // alias (eh specific)
-            else if (alias == "eh b") {
-                alias = alias.Replace(alias, "eh d");
-            } else if (alias == "eh ch") {
-                alias = alias.Replace(alias, "eh t");
-            } else if (alias == "eh ng") {
-                alias = alias.Replace(alias, "eh n");
-            } else if (alias == "eh q") {
-                alias = alias.Replace(alias, "eh t");
-            } else if (alias == "eh y") {
-                alias = alias.Replace(alias, "ey");
-            } else if (alias == "eh zh") {
-                alias = alias.Replace(alias, "eh s");
+            //VC (eh)
+            //VC (eh specific)
+            if (alias == "eh b") {
+                return alias.Replace("eh b", "eh d");
+            }
+            if (alias == "eh ch") {
+                return alias.Replace("eh ch", "eh t");
+            }
+            if (alias == "eh dr") {
+                return alias.Replace("eh dr", "eh d");
+            }
+            if (alias == "eh dx") {
+                return alias.Replace("eh dx", "eh d");
+            }
+            if (alias == "eh ng") {
+                return alias.Replace("eh ng", "eh n");
+            }
+            if (alias == "eh q") {
+                return alias.Replace("eh q", "eh t");
+            }
+            if (alias == "eh y") {
+                return alias.Replace("eh y", "ey");
+            }
+            if (alias == "eh tr") {
+                return alias.Replace("eh tr", "eh t");
+            }
+            if (alias == "eh zh") {
+                return alias.Replace("eh zh", "eh s");
             }
 
-              // alias (er specific)
-            else if (alias == "er ch") {
-                alias = alias.Replace(alias, "er t");
-            } else if (alias == "er jh") {
-                alias = alias.Replace(alias, "er d");
-            } else if (alias == "er ng") {
-                alias = alias.Replace(alias, "er n");
-            } else if (alias == "er q") {
-                alias = alias.Replace(alias, "er t");
-            } else if (alias == "er r") {
-                alias = alias.Replace(alias, "er");
-            } else if (alias == "er sh") {
-                alias = alias.Replace(alias, "er s");
-            } else if (alias == "er zh") {
-                alias = alias.Replace(alias, "er z");
+            //VC (er specific)
+            if (alias == "er ch") {
+                return alias.Replace("er ch", "er t");
+            }
+            if (alias == "er dr") {
+                return alias.Replace("er dr", "er d");
+            }
+            if (alias == "er dx") {
+                return alias.Replace("er dx", "er d");
+            }
+            if (alias == "er jh") {
+                return alias.Replace("er jh", "er d");
+            }
+            if (alias == "er ng") {
+                return alias.Replace("er ng", "er n");
+            }
+            if (alias == "er q") {
+                return alias.Replace("er q", "er t");
+            }
+            if (alias == "er r") {
+                return alias.Replace("er r", "er");
+            }
+            if (alias == "er sh") {
+                return alias.Replace("er sh", "er s");
+            }
+            if (alias == "eh tr") {
+                return alias.Replace("eh tr", "eh t");
+            }
+            if (alias == "er zh") {
+                return alias.Replace("er zh", "er z");
             }
 
-            // alias (ih specific)
-            else if (alias == "ih b") {
-                alias = alias.Replace(alias, "ih d");
-            } else if (alias == "ih hh") {
-                alias = alias.Replace(alias, "iy hh");
-            } else if (alias == "ih q") {
-                alias = alias.Replace(alias, "ih t");
-            } else if (alias == "ih w") {
-                alias = alias.Replace(alias, "iy w");
-            } else if (alias == "ih y") {
-                alias = alias.Replace(alias, "iy y");
-            } else if (alias == "ih zh") {
-                alias = alias.Replace(alias, "ih z");
+            //VC (ih specific)
+            if (alias == "ih b") {
+                return alias.Replace("ih b", "ih d");
+            }
+            if (alias == "ih dr") {
+                return alias.Replace("ih dr", "ih d");
+            }
+            if (alias == "ih dx") {
+                return alias.Replace("ih dx", "ih d");
+            }
+            if (alias == "ih hh") {
+                return alias.Replace("ih hh", "iy hh");
+            }
+            if (alias == "ih q") {
+                return alias.Replace("ih q", "ih t");
+            }
+            if (alias == "ih tr") {
+                return alias.Replace("ih tr", "ih t");
+            }
+            if (alias == "ih w") {
+                return alias.Replace("ih w", "iy w");
+            }
+            if (alias == "ih y") {
+                return alias.Replace("ih y", "iy y");
+            }
+            if (alias == "ih zh") {
+                return alias.Replace("ih zh", "ih z");
             }
 
-            // alias (iy specific)
-            else if (alias == "iy f") {
-                alias = alias.Replace(alias, "iy hh");
-            } else if (alias == "iy n") {
-                alias = alias.Replace(alias, "iy m");
-            } else if (alias == "iy ng") {
-                alias = alias.Replace(alias, "ih ng");
-            } else if (alias == "iy q") {
-                alias = alias.Replace(alias, "iy t");
-            } else if (alias == "iy zh") {
-                alias = alias.Replace(alias, "iy z");
+            //VC (iy specific)
+            if (alias == "iy dr") {
+                return alias.Replace("iy dr", "iy d");
+            }
+            if (alias == "iy dx") {
+                return alias.Replace("iy dx", "iy d");
+            }
+            if (alias == "iy f") {
+                return alias.Replace("iy f", "iy hh");
+            }
+            if (alias == "iy n") {
+                return alias.Replace("iy n", "iy m");
+            }
+            if (alias == "iy ng") {
+                return alias.Replace("iy ng", "ih ng");
+            }
+            if (alias == "iy q") {
+                return alias.Replace("iy q", "iy t");
+            }
+            if (alias == "iy tr") {
+                return alias.Replace("iy tr", "iy t");
+            }
+            if (alias == "iy zh") {
+                return alias.Replace("iy zh", "iy z");
             }
 
-            // alias (uh)
-            // alias (uh specific)
-            else if (alias == "uh ch") {
-                alias = alias.Replace(alias, "uh t");
-            } else if (alias == "uh jh") {
-                alias = alias.Replace(alias, "uw d");
-            } else if (alias == "uh q") {
-                alias = alias.Replace(alias, "uh t");
-            } else if (alias == "uh zh") {
-                alias = alias.Replace(alias, "uw z");
+            //VC (uh)
+            //VC (uh specific)
+            if (alias == "uh ch") {
+                return alias.Replace("uh ch", "uh t");
+            }
+            if (alias == "uh dr") {
+                return alias.Replace("uh dr", "uh d");
+            }
+            if (alias == "uh dx") {
+                return alias.Replace("uh dx", "uh d");
+            }
+            if (alias == "uh jh") {
+                return alias.Replace("uh jh", "uw d");
+            }
+            if (alias == "uh q") {
+                return alias.Replace("uh q", "uh t");
+            }
+            if (alias == "uh tr") {
+                return alias.Replace("uh tr", "uh t");
+            }
+            if (alias == "uh zh") {
+                return alias.Replace("uh zh", "uw z");
             }
 
-            // alias (uw specific)
-            else if (alias == "uw ch") {
-                alias = alias.Replace(alias, "uw t");
-            } else if (alias == "uw jh") {
-                alias = alias.Replace(alias, "uw d");
-            } else if (alias == "uw ng") {
-                alias = alias.Replace(alias, "uw n");
-            } else if (alias == "uw q") {
-                alias = alias.Replace(alias, "uw t");
-            } else if (alias == "uw zh") {
-                alias = alias.Replace(alias, "uw z");
+            //VC (uw specific)
+            if (alias == "uw ch") {
+                return alias.Replace("uw ch", "uw t");
             }
+            if (alias == "uw dr") {
+                return alias.Replace("uw dr", "uw d");
+            }
+            if (alias == "uw dx") {
+                return alias.Replace("uw dx", "uw d");
+            }
+            if (alias == "uw jh") {
+                return alias.Replace("uw jh", "uw d");
+            }
+            if (alias == "uw ng") {
+                return alias.Replace("uw ng", "uw n");
+            }
+            if (alias == "uw q") {
+                return alias.Replace("uw q", "uw t");
+            }
+            if (alias == "uw tr") {
+                return alias.Replace("uw tr", "uw t");
+            }
+            if (alias == "uw zh") {
+                return alias.Replace("uw zh", "uw z");
+            }
+
 
             //CC (b)
             //CC (b specific)
-            else if (alias == "b ch") {
+            if (alias == "b ch") {
                 return alias.Replace("b ch", "t ch");
-            } else if (alias == "b dh") {
+            }
+            if (alias == "b dh") {
                 return alias.Replace("b ch", "p dh");
-            } else if (alias == "b ng") {
+            }
+            if (alias == "b ng") {
                 return alias.Replace("b ng", "ng");
-            } else if (alias == "b th") {
+            }
+            if (alias == "b th") {
                 return alias.Replace("b th", "t th");
-            } else if (alias == "b zh") {
+            }
+            if (alias == "b zh") {
                 return alias.Replace("zh", "z");
             }
 
-            //CC (ch specelse ific)
-            else if (alias == "ch r") {
+            //CC (ch specific)
+            if (alias == "ch r") {
                 return alias.Replace("ch r", "ch er");
-            } else if (alias == "ch w") {
+            }
+            if (alias == "ch w") {
                 return alias.Replace("ch w", "ch ah");
-            } else if (alias == "ch y") {
+            }
+            if (alias == "ch y") {
                 return alias.Replace("ch y", "ch iy");
-            } else if (alias == "ch -") {
+            }
+            if (alias == "ch -") {
                 return alias.Replace("ch", "jh");
-            } else if (alias == "- ch") {
+            }
+            if (alias == "- ch") {
                 return alias.Replace("ch", "jh");
             }
 
-            //CC (d specelse ific)
-            else if (alias == "d ch") {
+            //CC (d specific)
+            if (alias == "d ch") {
                 return alias.Replace("d", "t");
-            } else if (alias == "d ng") {
+            }
+            if (alias == "d ng") {
                 return alias.Replace("ng", "n");
-            } else if (alias == "d th") {
+            }
+            if (alias == "d th") {
                 return alias.Replace("d th", "t th");
-            } else if (alias == "d zh") {
+            }
+            if (alias == "d zh") {
                 return alias.Replace("zh", "z");
             }
 
-            //CC (dh specelse ific)
-            else if (alias == "dh ch") {
+            //CC (dh specific)
+            if (alias == "dh ch") {
                 return alias.Replace("dh ch", "t ch");
-            } else if (alias == "dh dh") {
+            }
+            if (alias == "dh dh") {
                 return alias.Replace("dh dh", "dh d");
-            } else if (alias == "dh ng") {
+            }
+            if (alias == "dh ng") {
                 return alias.Replace("dh ng", "d n");
-            } else if (alias == "dh zh") {
+            }
+            if (alias == "dh zh") {
                 return alias.Replace("zh", "z");
             }
 
 
-            //CC (f specelse ific)
-            else if (alias == "f sh") {
+            //CC (f specific)
+            if (alias == "f sh") {
                 return alias.Replace("sh", "s");
-            } else if (alias == "f w") {
+            }
+            if (alias == "f w") {
                 return alias.Replace("f w", "f uw");
-            } else if (alias == "f z") {
+            }
+            if (alias == "f z") {
                 return alias.Replace("z", "s");
-            } else if (alias == "f zh") {
+            }
+            if (alias == "f zh") {
                 return alias.Replace("zh", "s");
-            } else if (alias == "f -") {
+            }
+            if (alias == "f -") {
                 return alias.Replace("f", "th");
             }
 
-            //CC (g specelse ific)
-            else if (alias == "g ch") {
+            //CC (g specific)
+            if (alias == "g ch") {
                 return alias.Replace("g ch", "t ch");
-            } else if (alias == "g dh") {
+            }
+            if (alias == "g dh") {
                 return alias.Replace("g", "d");
-            } else if (alias == "g ng") {
+            }
+            if (alias == "g ng") {
                 return alias.Replace("g ng", "ng");
-            } else if (alias == "g zh") {
+            }
+            if (alias == "g zh") {
                 return alias.Replace("zh", "z");
             }
 
-            //CC (hh specelse ific)
-            else if (alias == "hh f") {
+            //CC (hh specific)
+            if (alias == "hh f") {
                 return alias.Replace("hh", "f");
-            } else if (alias == "hh l") {
+            }
+            if (alias == "hh l") {
                 return alias.Replace("hh", "f");
-            } else if (alias == "hh ng") {
+            }
+            if (alias == "hh ng") {
                 return alias.Replace("hh ng", "s n");
-            } else if (alias == "hh r") {
+            }
+            if (alias == "hh r") {
                 return alias.Replace("hh", "f");
-            } else if (alias == "hh s") {
+            }
+            if (alias == "hh s") {
                 return alias.Replace("hh", "f");
-            } else if (alias == "hh sh") {
+            }
+            if (alias == "hh sh") {
                 return alias.Replace("hh sh", "s s");
-            } else if (alias == "hh t") {
+            }
+            if (alias == "hh t") {
                 return alias.Replace("hh t", "f");
-            } else if (alias == "hh th") {
+            }
+            if (alias == "hh th") {
                 return alias.Replace("hh th", "hh");
-            } else if (alias == "hh w") {
+            }
+            if (alias == "hh w") {
                 return alias.Replace("hh w", "hh uw");
-            } else if (alias == "hh y") {
+            }
+            if (alias == "hh y") {
                 return alias.Replace("hh", "f");
-            } else if (alias == "hh z") {
+            }
+            if (alias == "hh z") {
                 return alias.Replace("hh z", "s s");
-            } else if (alias == "hh -") {
+            }
+            if (alias == "hh -") {
                 return alias.Replace("hh -", null);
             }
 
-            //CC (jh specelse ific)
-            else if (alias == "jh hh") {
+            //CC (jh specific)
+            if (alias == "jh hh") {
                 return alias.Replace("jh", "s");
-            } else if (alias == "jh l") {
+            }
+            if (alias == "jh l") {
                 return alias.Replace("jh", "f");
-            } else if (alias == "jh m") {
+            }
+            if (alias == "jh m") {
                 return alias.Replace("jh", "s");
-            } else if (alias == "jh n") {
+            }
+            if (alias == "jh n") {
                 return alias.Replace("jh", "s");
-            } else if (alias == "jh ng") {
+            }
+            if (alias == "jh ng") {
                 return alias.Replace("jh ng", "s n");
-            } else if (alias == "jh r") {
+            }
+            if (alias == "jh r") {
                 return alias.Replace("jh r", "jh ah");
-            } else if (alias == "jh s") {
+            }
+            if (alias == "jh s") {
                 return alias.Replace("jh", "f");
-            } else if (alias == "jh w") {
+            }
+            if (alias == "jh w") {
                 return alias.Replace("jh w", "jh ah");
-            } else if (alias == "jh y") {
+            }
+            if (alias == "jh y") {
                 return alias.Replace("y", "iy");
             }
 
-            //CC (k specelse ific)
-            else if (alias == "k z") {
+            //CC (k specific)
+            if (alias == "k z") {
                 return alias.Replace("z", "s");
-            } else if (alias == "k zh") {
+            }
+            if (alias == "k zh") {
                 return alias.Replace("zh", "s");
             }
 
-            //CC (l specelse ific)
-            else if (alias == "l ch") {
+            //CC (l specific)
+            if (alias == "l ch") {
                 return alias.Replace("ch", "t");
-            } else if (alias == "l b") {
+            }
+            if (alias == "l b") {
                 return alias.Replace("l", "d");
-            } else if (alias == "l hh") {
+            }
+            if (alias == "l hh") {
                 return alias.Replace("l", "r");
-            } else if (alias == "l jh") {
+            }
+            if (alias == "l jh") {
                 return alias.Replace("jh", "d");
-            } else if (alias == "l ng") {
+            }
+            if (alias == "l ng") {
                 return alias.Replace("ng", "n");
-            } else if (alias == "l sh") {
+            }
+            if (alias == "l sh") {
                 return alias.Replace("sh", "s");
-            } else if (alias == "l th") {
+            }
+            if (alias == "l th") {
                 return alias.Replace("l th", "l s");
-            } else if (alias == "l zh") {
+            }
+            if (alias == "l zh") {
                 return alias.Replace("zh", "z");
             }
 
-            //CC (m specelse ific)
-            else if (alias == "m ch") {
+            //CC (m specific)
+            if (alias == "m ch") {
                 return alias.Replace("m", "n");
-            } else if (alias == "m hh") {
+            }
+            if (alias == "m hh") {
                 return alias.Replace("m hh", "hh");
-            } else if (alias == "m jh") {
+            }
+            if (alias == "m jh") {
                 return alias.Replace("jh", "d");
-            } else if (alias == "m ng") {
+            }
+            if (alias == "m ng") {
                 return alias.Replace("ng", "n");
-            } else if (alias == "m n") {
+            }
+            if (alias == "m n") {
                 return alias.Replace("m n", "n");
-            } else if (alias == "m m") {
+            }
+            if (alias == "m m") {
                 return alias.Replace("m m", "n");
-            } else if (alias == "m r") {
+            }
+            if (alias == "m r") {
                 return alias.Replace("m", "n");
-            } else if (alias == "m s") {
+            }
+            if (alias == "m s") {
                 return alias.Replace("m", "n");
-            } else if (alias == "m sh") {
+            }
+            if (alias == "m sh") {
                 return alias.Replace("m", "n");
-            } else if (alias == "m v") {
+            }
+            if (alias == "m v") {
                 return alias.Replace("m v", "m m");
-            } else if (alias == "m zh") {
+            }
+            if (alias == "m zh") {
                 return alias.Replace("zh", "z");
             }
 
-            //CC (n specelse ific)
-            else if (alias == "n ng") {
+            //CC (n specific)
+            if (alias == "n ng") {
                 return alias.Replace("ng", "n");
-            } else if (alias == "n n") {
+            }
+            if (alias == "n n") {
                 return alias.Replace("n n", "n");
-            } else if (alias == "n m") {
+            }
+            if (alias == "n m") {
                 return alias.Replace("n m", "n");
-            } else if (alias == "n v") {
+            }
+            if (alias == "n v") {
                 return alias.Replace("n v", "n m");
-            } else if (alias == "n zh") {
+            }
+            if (alias == "n zh") {
                 return alias.Replace("zh", "z");
             }
 
@@ -1114,23 +1319,28 @@ namespace OpenUtau.Plugin.Builtin {
                 }
             }
 
-            //CC (ng specelse ific)
+            //CC (ng specific)
             if (alias == "ng ch") {
                 return alias.Replace("ch", "t");
-            } else if (alias == "ng ng") {
+            }
+            if (alias == "ng ng") {
                 return alias.Replace("ng", "n");
-            } else if (alias == "ng v") {
+            }
+            if (alias == "ng v") {
                 return alias.Replace("ng v", "ng s");
-            } else if (alias == "ng zh") {
+            }
+            if (alias == "ng zh") {
                 return alias.Replace("zh", "z");
             }
 
-              //CC (p specelse ific)
-              else if (alias == "p dx") {
+            //CC (p specific)
+            if (alias == "p dx") {
                 return alias.Replace("p dx", "t d");
-            } else if (alias == "p z") {
+            }
+            if (alias == "p z") {
                 return alias.Replace("z", "s");
-            } else if (alias == "p zh") {
+            }
+            if (alias == "p zh") {
                 return alias.Replace("zh", "s");
             }
             //CC (q)
@@ -1140,119 +1350,160 @@ namespace OpenUtau.Plugin.Builtin {
                 }
             }
 
-            //CC (r specelse ific)
+            //CC (r specific)
             if (alias == "r ch") {
                 return alias.Replace("ch", "t");
-            } else if (alias == "r dr") {
+            }
+            if (alias == "r dr") {
                 return alias.Replace("dr", "jh");
-            } else if (alias == "r dx") {
+            }
+            if (alias == "r dx") {
                 return alias.Replace("dx", "d");
-            } else if (alias == "r ng") {
+            }
+            if (alias == "r ng") {
                 return alias.Replace("ng", "n");
-            } else if (alias == "r sh") {
+            }
+            if (alias == "r sh") {
                 return alias.Replace("sh", "s");
-            } else if (alias == "r zh") {
+            }
+            if (alias == "r zh") {
                 return alias.Replace("zh", "z");
             }
 
-            //CC (s specelse ific)
-            else if (alias == "s dr") {
+            //CC (s specific)
+            if (alias == "s dr") {
                 return alias.Replace("dr", "jh");
-            } else if (alias == "s ch") {
+            }
+            if (alias == "s ch") {
                 return alias.Replace("ch", "t");
-            } else if (alias == "s dx") {
+            }
+            if (alias == "s dx") {
                 return alias.Replace("dx", "d");
-            } else if (alias == "s ng") {
+            }
+            if (alias == "s ng") {
                 return alias.Replace("ng", "n");
-            } else if (alias == "s sh") {
+            }
+            if (alias == "s sh") {
                 return alias.Replace("sh", "s");
-            } else if (alias == "s th") {
+            }
+            if (alias == "s th") {
                 return alias.Replace("s", "z");
-            } else if (alias == "s v") {
+            }
+            if (alias == "s v") {
                 return alias.Replace("s", "z");
-            } else if (alias == "s zh") {
+            }
+            if (alias == "s zh") {
                 return alias.Replace("zh", "s");
             }
 
-            //CC (sh specelse ific)
-            else if (alias == "sh f") {
+            //CC (sh specific)
+            if (alias == "sh f") {
                 return alias.Replace("sh", "s");
-            } else if (alias == "sh hh") {
+            }
+            if (alias == "sh hh") {
                 return alias.Replace("sh", "s");
-            } else if (alias == "sh l") {
+            }
+            if (alias == "sh l") {
                 return alias.Replace("sh", "s");
-            } else if (alias == "sh m") {
+            }
+            if (alias == "sh m") {
                 return alias.Replace("sh", "s");
-            } else if (alias == "sh n") {
+            }
+            if (alias == "sh n") {
                 return alias.Replace("sh", "s");
-            } else if (alias == "sh ng") {
+            }
+            if (alias == "sh ng") {
                 return alias.Replace("sh ng", "s n");
-            } else if (alias == "sh r") {
+            }
+            if (alias == "sh r") {
                 return alias.Replace("sh", "s");
-            } else if (alias == "sh s") {
+            }
+            if (alias == "sh s") {
                 return alias.Replace("sh", "s");
-            } else if (alias == "sh sh") {
+            }
+            if (alias == "sh sh") {
                 return alias.Replace("sh sh", "s s");
-            } else if (alias == "sh th") {
+            }
+            if (alias == "sh th") {
                 return alias.Replace("sh th", "th");
-            } else if (alias == "sh w") {
+            }
+            if (alias == "sh w") {
                 return alias.Replace("sh w", "sh uw");
-            } else if (alias == "sh y") {
+            }
+            if (alias == "sh y") {
                 return alias.Replace("sh y", "sh iy");
-            } else if (alias == "sh z") {
+            }
+            if (alias == "sh z") {
                 return alias.Replace("sh z", "s s");
             }
 
-            //CC (t specelse ific)
-            else if (alias == "t y") {
+            //CC (t specific)
+            if (alias == "t y") {
                 return alias.Replace("y", "iy");
-            } else if (alias == "t z") {
+            }
+            if (alias == "t z") {
                 return alias.Replace("t", "g");
-            } else if (alias == "t zh") {
+            }
+            if (alias == "t zh") {
                 return alias.Replace("t zh", "g z");
             }
 
-            //CC (th specelse ific)
-            else if (alias == "th dr") {
+            //CC (th specific)
+            if (alias == "th dr") {
                 return alias.Replace("th dr", "s jh");
-            } else if (alias == "th y") {
+            }
+            if (alias == "th y") {
                 return alias.Replace("th y", "th ih");
-            } else if (alias == "th zh") {
+            }
+            if (alias == "th zh") {
                 return alias.Replace("zh", "s");
             }
 
-            //CC (v specelse ific)
-            else if (alias == "v dh") {
+            //CC (v specific)
+            if (alias == "v dh") {
                 return alias.Replace("dh", "d");
-            } else if (alias == "v f") {
+            }
+            if (alias == "v f") {
                 return alias.Replace("v", "s");
-            } else if (alias == "v hh") {
+            }
+            if (alias == "v hh") {
                 return alias.Replace("v", "s");
-            } else if (alias == "v l") {
+            }
+            if (alias == "v l") {
                 return alias.Replace("v", "s");
-            } else if (alias == "v m") {
+            }
+            if (alias == "v m") {
                 return alias.Replace("v", "s");
-            } else if (alias == "v n") {
+            }
+            if (alias == "v n") {
                 return alias.Replace("v", "s");
-            } else if (alias == "v ng") {
+            }
+            if (alias == "v ng") {
                 return alias.Replace("v ng", "s n");
-            } else if (alias == "v r") {
+            }
+            if (alias == "v r") {
                 return alias.Replace("v", "s");
-            } else if (alias == "v th") {
+            }
+            if (alias == "v th") {
                 return alias.Replace("v th", "th");
-            } else if (alias == "v s") {
+            }
+            if (alias == "v s") {
                 return alias.Replace("v", "s");
-            } else if (alias == "v sh") {
+            }
+            if (alias == "v sh") {
                 return alias.Replace("v sh", "s s");
-            } else if (alias == "v w") {
+            }
+            if (alias == "v w") {
                 return alias.Replace("v", "s");
-            } else if (alias == "v y") {
+            }
+            if (alias == "v y") {
                 return alias.Replace("v", "s");
-            } else if (alias == "v z") {
+            }
+            if (alias == "v z") {
                 return alias.Replace("v z", "s s");
             }
 
-            //CC (w specelse ific)
+            //CC (w specific)
             foreach (var c1 in new[] { "w" }) {
                 foreach (var c2 in consonants) {
                     alias = alias.Replace(c1 + " " + c2, "uw" + " " + c2);
@@ -1262,7 +1513,7 @@ namespace OpenUtau.Plugin.Builtin {
                 return alias.Replace("w", "uw");
             }
 
-            //CC (y specelse ific)
+            //CC (y specific)
             foreach (var c1 in new[] { "y" }) {
                 foreach (var c2 in consonants) {
                     alias = alias.Replace(c1 + " " + c2, "iy" + " " + c2);
@@ -1272,39 +1523,53 @@ namespace OpenUtau.Plugin.Builtin {
                 return alias.Replace("y", "iy");
             }
 
-//CC (z specelse ific)
-else if (alias == "z ch") {
+            //CC (z specific)
+            if (alias == "z ch") {
                 return alias.Replace("ch", "t");
-            } else if (alias == "z dr") {
+            }
+            if (alias == "z dr") {
                 return alias.Replace("dr", "jh");
-            } else if (alias == "z dx") {
+            }
+            if (alias == "z dx") {
                 return alias.Replace("dx", "d");
-            } else if (alias == "z tr") {
+            }
+            if (alias == "z tr") {
                 return alias.Replace("tr", "t");
-            } else if (alias == "z ng") {
+            }
+            if (alias == "z ng") {
                 return alias.Replace("ng", "n");
-            } else if (alias == "z z") {
+            }
+            if (alias == "z z") {
                 return alias.Replace("z z", "z s");
-            } else if (alias == "z zh") {
+            }
+            if (alias == "z zh") {
                 return alias.Replace("z zh", "z s");
             }
-              //CC (zh)
-              //CC (zh specelse ific)
-              else if (alias == "zh ch") {
+            //CC (zh)
+            //CC (zh specific)
+            if (alias == "zh ch") {
                 return alias.Replace("ch", "t");
-            } else if (alias == "zh dr") {
+            }
+            if (alias == "zh dr") {
                 return alias.Replace("dr", "jh");
-            } else if (alias == "zh dx") {
+            }
+            if (alias == "zh dx") {
                 return alias.Replace("dx", "d");
-            } else if (alias == "zh tr") {
+            }
+            if (alias == "zh tr") {
                 return alias.Replace("tr", "t");
-            } else if (alias == "zh ng") {
+            }
+            if (alias == "zh ng") {
                 return alias.Replace("ng", "n");
-            } else if (alias == "zh z") {
+            }
+            if (alias == "zh z") {
                 return alias.Replace("zh z", "z s");
-            } else if (alias == "zh zh") {
+            }
+            if (alias == "zh zh") {
                 return alias.Replace("z zh", "z s");
             }
+
+
             //VC's
             foreach (var v1 in new[] { "aw", "ow", "uh" }) {
                 foreach (var c1 in consonants) {
