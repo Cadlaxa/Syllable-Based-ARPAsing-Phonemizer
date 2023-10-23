@@ -5,7 +5,7 @@ Custom English Arpabet Phonemizer based on Syllable-Based API Phonemizer
 
 As of version **`V0.0.55`** and above, it now supports the majority of all ARPAsing voicebanks, also **`V0.0.55`** and above is much more stable than the previous versions of this external Phonemizer.
 
-#### 📍 if you want to suggest a feature for ARPA+, you can suggest on the issues tab
+#### 📍 if you want to suggest a feature for ARPA+, you can suggest on the issues tab or the discussions tab
 #### 📍 if there's any issue with the Phonemizer, you can contact me through my [Twitter](https://twitter.com/cadlaxa). Let me know if there's a problem tehee.
  - - - -
 ### Table of contents
