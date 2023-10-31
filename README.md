@@ -62,7 +62,7 @@ https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/assets/92255161/9b
     
 https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/assets/92255161/0fbf752b-3265-443b-95c2-a1beb34d331e
 - **English**
-  - **Vocal: Arpa_test**
+  - **Vocal: KYE ARPAsing**
   - `EN ARPA`:
     
      https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/assets/92255161/ee107d2b-16b5-4847-abab-79d676a261be
