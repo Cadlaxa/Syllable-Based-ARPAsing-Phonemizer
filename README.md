@@ -10,6 +10,7 @@ As of version **`V0.0.55`** and above, it now supports the majority of all ARPAs
  - - - -
 ### Table of contents
 - **[How to download and install the custom Phonemizer](https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/blob/main/README.md#how-to-download-and-install-the-custom-phonemizer)**
+- **[Supported Consonants and Vowels](https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/blob/main/README.md#how-to-download-and-install-the-custom-phonemizer)**
 - **[Mechanics of the Phonemizer](https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/blob/main/README.md#mechanics-of-the-phonemizer)**
     - **[How syllables work](https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/blob/main/README.md#how-syllables-work)**
     - **[Vowel and Consonant Fallbacks](https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/blob/main/README.md#vowel-and-consonant-fallbacks)**
@@ -18,6 +19,16 @@ As of version **`V0.0.55`** and above, it now supports the majority of all ARPAs
 ## How to download and install the custom Phonemizer
 
 - To download and install the Phonemizer, click on Releases then click the dll file to download. When downloaded, move ArpaPlusPhonemizer.dll into the path\to\OpenUtau\Plugins folder or just simply drag the dll file and drop onto the OpenUtau program.
+ - - - -
+ ## Supported Consonants and Vowels
+ - **Consonants are automatically supported by this phonemizer but if the consonants aren't listed on the `GetTransitionBasicLengthMs`, their lengths are defaulted to 1.0 ms**
+ - **Currently supported vowels:**
+   - **`aa`, `ax`, `ae`, `ah`, `ao`, `aw`, `ay`, `eh`, `er`, `ey`, `ih`, `iy`, `ow`, `oy`, `uh`, `uw`, `a`, `e`, `i`, `o`, `u`, `ai`, `ei`, `oi`, `au`, `ou`, `ix`, `ux`,
+`aar`, `ar`, `axr`, `aer`, `ahr`, `aor`, `or`, `awr`, `aur`, `ayr`, `air`, `ehr`, `eyr`, `eir`, `ihr`, `iyr`, `ir`, `owr`, `our`, `oyr`, `oir`, `uhr`, `uwr`, `ur`,
+`aal`, `al`, `axl`, `ael`, `ahl`, `aol`, `ol`, `awl`, `aul`, `ayl`, `ail`, `ehl`, `el`, `eyl`, `eil`, `ihl`, `iyl`, `il`, `owl`, `oul`, `oyl`, `oil`, `uhl`, `uwl`, `ul`,
+`naan`, `an`, `axn`, `aen`, `ahn`, `aon`, `on`, `awn`, `aun`, `ayn`, `ain`, `ehn`, `en`, `eyn`, `ein`, `ihn`, `iyn`, `in`, `own`, `oun`, `oyn`, `oin`, `uhn`, `uwn`, `un`,
+`aang`, `ang`, `axng`, `aeng`, `ahng`, `aong`, `ong`, `awng`, `aung`, `ayng`, `aing`, `ehng`, `eng`, `eyng`, `eing`, `ihng`, `iyng`, `ing`, `owng`, `oung`, `oyng`, `oing`, `uhng`, `uwng`, `ung`, `aam`, `am`, `axm`, `aem`, `ahm`, `aom`, `om`, `awm`, `aum`, `aym`, `aim`, `ehm`, `em`, `eym`, `eim`, `ihm`, `iym`, `im`, `owm`, `oum`, `oym`, `oim`, `uhm`, `uwm`, `um`, `oh`, `eu`, `oe`, `yw`, `yx`, `wx`**
+    - **📍 note: if the custom vowels are not here on the list or in the code, they will be recognized as consonants, Syllable-based Phonemizers will have to define all possible vowels in order to them to be recognized as a Vowel**
  - - - -
  ## Mechanics of the Phonemizer
 
