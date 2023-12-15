@@ -25,7 +25,7 @@ namespace OpenUtau.Plugin.Builtin {
         "aam", "am", "axm", "aem", "ahm", "aom", "om", "awm", "aum", "aym", "aim", "ehm", "em", "eym", "eim", "ihm", "iym", "im", "owm", "oum", "oym", "oim", "uhm", "uwm", "um", "oh",
         "eu", "oe", "yw", "yx", "wx"
         };
-        private readonly string[] consonants = "b,ch,d,dh,dr,dx,f,g,hh,jh,k,l,m,n,ng,p,q,r,s,sh,t,th,tr,v,w,y,z,zh".Split(',');
+        private readonly string[] consonants = "b,ch,d,dh,dx,f,g,hh,jh,k,l,m,n,ng,p,q,r,s,sh,t,th,v,w,y,z,zh".Split(',');
         private readonly string[] affricates = "ch,jh,j".Split(',');
         private readonly string[] tapConsonant = "dx".Split(",");
         private readonly string[] semilongConsonants = "ng,n,m,v,z,q,hh".Split(",");
@@ -204,24 +204,24 @@ namespace OpenUtau.Plugin.Builtin {
             var firstC = 0;
 
             foreach (var entry in missingVphonemes) {
-                if (HasOto(entry.Key, syllable.tone)) {
+                if (!HasOto("ax", syllable.tone) || !HasOto("b ax", syllable.tone) || !HasOto("ax b", syllable.tone)) {
                     isMissingVPhonemes = true;
                     break;
                 }
             }
             foreach (var entry in missingCphonemes) {
-                if (HasOto(entry.Key, syllable.tone)) {
+                if (!HasOto("wh", syllable.tone) || !HasOto("zh er", syllable.tone) || !HasOto("ah dx", syllable.tone)) {
                     isMissingCPhonemes = true;
                     break;
                 }
             }
             foreach (var entry in timitphonemes) {
-                if (HasOto(entry.Key, syllable.tone)) {
+                if (!HasOto("gcl", syllable.tone) || !HasOto("f axh", syllable.tone) || !HasOto("ih tcl", syllable.tone)) {
                     isTimitPhonemes = true;
                     break;
                 }
             }
-
+            
             // STARTING V
             if (syllable.IsStartingV) {
                 // TRIES - V THEN V
@@ -335,40 +335,38 @@ namespace OpenUtau.Plugin.Builtin {
                 for (var i = firstC; i < cc.Length - 1; i++) {
                     var ccv = $"{string.Join("", cc)} {v}";
                     var ccv1 = string.Join("", cc.Skip(i)) + " " + v;
-                    if (HasOto(ccv, syllable.vowelTone) || HasOto(ValidateAlias(ccv), syllable.vowelTone)) {
-                        basePhoneme = ccv;
-                        lastC = i;
-                        break;
-                    } else {
-                        if (HasOto(ccv1, syllable.vowelTone) || HasOto(ValidateAlias(ccv1), syllable.vowelTone)) {
+                    if (syllable.CurrentWordCc.Length >= 2) {
+                        if (HasOto(ccv, syllable.vowelTone) || HasOto(ValidateAlias(ccv), syllable.vowelTone)) {
+                            basePhoneme = ccv;
+                            lastC = i;
+                            break;
+                        } else if (HasOto(ccv1, syllable.vowelTone) || HasOto(ValidateAlias(ccv1), syllable.vowelTone)) {
                             basePhoneme = ccv1;
-                            break;
-                        } else if (HasOto(crv, syllable.vowelTone) || HasOto(ValidateAlias(crv), syllable.vowelTone)) {
-                            basePhoneme = crv;
-                            break;
-                        } else {
-                            basePhoneme = $"{cc.Last()} {v}";
                         }
+                        break;
+                    } else if (syllable.CurrentWordCc.Length >= 1 && syllable.PreviousWordCc.Length == 1) {
+                        basePhoneme = crv;
                     }
                 }
                 // try [V C], [V CC], [V -][- C]
                 for (var i = lastC + 1; i >= 0; i--) {
                     var vr = $"{prevV} -";
-                    var vcc = $"{prevV} {string.Join("", cc.Take(2))}"; // bug on vcc, sequence of [{vowel} v][v f][f {vowel}] turns in to [{vowel} q/t][- {vowel}] which is odd
+                    var vcc = $"{prevV} {string.Join("", cc.Take(2))}"; // bug on vcc, sequence of [{vowel} v][v f][f {vowel}] turns into [{vowel} q/t][- {vowel}] which is odd
                     var vc = $"{prevV} {cc[0]}";
                     if (i == 0 && (HasOto(vr, syllable.tone) || HasOto(ValidateAlias(vr), syllable.tone)) && !HasOto(vc, syllable.tone)) {
                         phonemes.Add(vr);
                         phonemes.Add($"- {cc[0]}");
                         break;
-                    }
-                    if (HasOto(vcc, syllable.tone) || HasOto(ValidateAlias(vcc), syllable.tone)) {
+                    } else if (cc.Length > 2 && HasOto(vcc, syllable.tone) || HasOto(ValidateAlias(vcc), syllable.tone)) {
                         phonemes.Add(vcc);
                         firstC = 1;
                         break;
-                    }
-                    if (HasOto(vc, syllable.tone) || HasOto(ValidateAlias(vc), syllable.tone)) {
+                    } else if (HasOto(vc, syllable.tone) || HasOto(ValidateAlias(vc), syllable.tone)) {
                         phonemes.Add(vc);
                         break;
+                    } else {
+                        // If none of the conditions are met, continue the loop
+                        continue;
                     }
                 }
             }
@@ -378,10 +376,6 @@ namespace OpenUtau.Plugin.Builtin {
                 var lcv = $"{cc.Last()} {v}";
                 if (!HasOto(cc1, syllable.tone)) {
                     cc1 = ValidateAlias(cc1);
-                }
-                // [C1 C2C3]
-                if (HasOto($"{cc[i]} {string.Join("", cc.Skip(i + 1))}", syllable.tone)) {
-                    cc1 = ($"{cc[i]} {string.Join("", cc.Skip(i + 1))}");
                 }
                 // [C1 C2]
                 if (!HasOto(cc1, syllable.tone)) {
@@ -399,21 +393,30 @@ namespace OpenUtau.Plugin.Builtin {
                 if (!HasOto(cc1, syllable.tone)) {
                     cc1 = ValidateAlias(cc1);
                 }
-                // CC V on multiple consonants ex [s tr ao] 
-                if (HasOto(ccv, syllable.vowelTone) || HasOto(ValidateAlias(ccv), syllable.vowelTone)) {
-                    basePhoneme = ccv;
-                    lastC = i;
-                    break;
-                } else if ((HasOto(lcv, syllable.vowelTone) || HasOto(ValidateAlias(lcv), syllable.vowelTone)) && HasOto(cc1, syllable.vowelTone) && !cc1.Contains($"{cc[i]} {cc[i + 1]}")) {
+                // CC V on multiple consonants ex [s tr ao] (only if the word starts with a CC)
+                if (syllable.CurrentWordCc.Length >= 2 && syllable.PreviousWordCc.Length >= 1) {
+                    if (HasOto(ccv, syllable.vowelTone) || HasOto(ValidateAlias(ccv), syllable.vowelTone)) {
+                        basePhoneme = ccv;
+                        lastC = i;
+                        break;
+                    } else if ((HasOto(lcv, syllable.vowelTone) || HasOto(ValidateAlias(lcv), syllable.vowelTone))
+                        && HasOto(cc1, syllable.vowelTone) && !HasOto(ccv, syllable.vowelTone)) {
+                        basePhoneme = lcv;
+                    }
+                    // [C1 C2C3]
+                    if (HasOto($"{cc[i]} {string.Join("", cc.Skip(i + 1))}", syllable.tone)) {
+                        cc1 = $"{cc[i]} {string.Join("", cc.Skip(i + 1))}";
+                    }
+                } else if (syllable.CurrentWordCc.Length >= 1 && syllable.PreviousWordCc.Length == 1) {
                     basePhoneme = lcv;
+                    // [C1 C2]
+                    if (!HasOto(cc1, syllable.tone)) {
+                        cc1 = $"{cc[i]} {cc[i + 1]}";
+                    }
                 }
                 if (i + 1 < lastC) {
                     if (!HasOto(cc1, syllable.tone)) {
                         cc1 = ValidateAlias(cc1);
-                    }
-                    // [C1 C2C3]
-                    if (HasOto($"{cc[i]} {string.Join("", cc.Skip(i + 1))}", syllable.tone)) {
-                        cc1 = ($"{cc[i]} {string.Join("", cc.Skip(i + 1))}");
                     }
                     // [C1 C2]
                     if (!HasOto(cc1, syllable.tone)) {
@@ -431,13 +434,26 @@ namespace OpenUtau.Plugin.Builtin {
                     if (!HasOto(cc1, syllable.tone)) {
                         cc1 = ValidateAlias(cc1);
                     }
-                    // CC V on multiple consonants ex [s tr ao]
-                    if (HasOto(ccv, syllable.vowelTone) || HasOto(ValidateAlias(ccv), syllable.vowelTone)) {
-                        basePhoneme = ccv;
-                        lastC = i;
-                        break;
-                    } else if ((HasOto(lcv, syllable.vowelTone) || HasOto(ValidateAlias(lcv), syllable.vowelTone)) && HasOto(cc1, syllable.vowelTone) && !cc1.Contains($"{cc[i]} {cc[i + 1]}")) {
+                    // CC V on multiple consonants ex [s tr ao] (only if the word starts with a CC)
+                    if (syllable.CurrentWordCc.Length >= 2 && syllable.PreviousWordCc.Length >= 1) {
+                        if (HasOto(ccv, syllable.vowelTone) || HasOto(ValidateAlias(ccv), syllable.vowelTone)) {
+                            basePhoneme = ccv;
+                            lastC = i;
+                            break;
+                        } else if ((HasOto(lcv, syllable.vowelTone) || HasOto(ValidateAlias(lcv), syllable.vowelTone))
+                            && HasOto(cc1, syllable.vowelTone) && !HasOto(ccv, syllable.vowelTone)) {
+                            basePhoneme = lcv;
+                        }
+                        // [C1 C2C3]
+                        if (HasOto($"{cc[i]} {string.Join("", cc.Skip(i + 1))}", syllable.tone)) {
+                            cc1 = $"{cc[i]} {string.Join("", cc.Skip(i + 1))}";
+                        }
+                    } else if (syllable.CurrentWordCc.Length >= 1 && syllable.PreviousWordCc.Length == 1) {
                         basePhoneme = lcv;
+                        // [C1 C2]
+                        if (!HasOto(cc1, syllable.tone)) {
+                            cc1 = $"{cc[i]} {cc[i + 1]}";
+                        }
                     }
                     if (HasOto(cc1, syllable.tone) && HasOto(cc1, syllable.tone) && !cc1.Contains($"{string.Join("", cc.Skip(i))}")) {
                         // like [V C1] [C1 C2] [C2 C3] [C3 ..]
@@ -455,6 +471,7 @@ namespace OpenUtau.Plugin.Builtin {
                     TryAddPhoneme(phonemes, syllable.tone, cc1);
                 }
             }
+
             phonemes.Add(basePhoneme);
             return phonemes;
         }
@@ -938,10 +955,10 @@ namespace OpenUtau.Plugin.Builtin {
                     return alias.Replace("ao dx", "ah d");
                 }
                 if (alias == "ao q") {
-                    return alias.Replace("ao q", "ah t");
+                    return alias.Replace("ao q", "ao t");
                 }
                 if (alias == "ao tr") {
-                    return alias.Replace("ao tr", "ah t");
+                    return alias.Replace("ao tr", "ao t");
                 }
                 if (alias == "ao y") {
                     return alias.Replace("ao y", "ow y");
@@ -1649,80 +1666,98 @@ namespace OpenUtau.Plugin.Builtin {
             }
 
             // glottal
-            foreach (var c1 in new[] { "q" }) {
-                foreach (var v1 in vowels) {
+            foreach (var v1 in vowels) {
+                if (!alias.Contains("cl " + v1) || !alias.Contains("q " + v1)) {
+                    alias = alias.Replace("q " + v1, "- " + v1);
+                }
+            }
+            foreach (var c2 in consonants) {
+                if (!alias.Contains(c2 + " cl") || !alias.Contains(c2 + " q")) {
+                    alias = alias.Replace(c2 + " q", $"{c2} -");
+                }
+            }
+            foreach (var c2 in consonants) {
+                if (!alias.Contains("cl " + c2) || !alias.Contains("q " + c2)) {
+                    alias = alias.Replace("q " + c2, "- " + c2);
+                }
+            }
 
-                    alias = alias.Replace(c1 + " " + v1, "-" + " " + v1);
-                }
-            }
-            foreach (var c1 in new[] { "q" }) {
-                foreach (var c2 in consonants) {
-                    alias = alias.Replace(c2 + " " + c1, $"{c2} -");
-                }
-            }
-            foreach (var c1 in new[] { "q" }) {
-                foreach (var c2 in consonants) {
-                    alias = alias.Replace(c1 + " " + c2, $"- {c2}");
-                }
-            }
-           
             // C -'s
             foreach (var c1 in new[] { "d", "dh", "g", "p", "jh", "b", "s", "ch", "t", "r", "n", "l", "ng", "sh", "zh", "th", "z", "f", "k", "s", "hh" }) {
                 foreach (var s in new[] { "-" }) {
-                    switch (c1 + " " + s) {
-                        case var str when alias.Contains(str):
-                            if (c1 == "d" || c1 == "dh" || c1 == "g" || c1 == "p") {
+                    var str = c1 + " " + s;
+                    if (alias.Contains(str)) {
+                        switch (c1) {
+                            case "d" when c1 == "d" || c1 == "dh" || c1 == "g" || c1 == "p":
                                 alias = alias.Replace(str, "b" + " " + s);
-                            } else if (c1 == "jh") {
+                                break;
+                            case "jh" when c1 == "jh":
                                 alias = alias.Replace(str, "ch" + " " + s);
-                            } else if (c1 == "b") {
+                                break;
+                            case "b" when c1 == "b":
                                 alias = alias.Replace(str, "d" + " " + s);
-                            } else if (c1 == "s") {
+                                break;
+                            case "s" when c1 == "s":
                                 alias = alias.Replace(str, "f" + " " + s);
-                            } else if (c1 == "ch") {
+                                break;
+                            case "ch" when c1 == "ch":
                                 alias = alias.Replace(str, "jh" + " " + s);
-                            } else if (c1 == "t") {
+                                break;
+                            case "t" when c1 == "t":
                                 alias = alias.Replace(str, "k" + " " + s);
-                            } else if (c1 == "r") {
+                                break;
+                            case "r" when c1 == "r":
                                 alias = alias.Replace(str, "er" + " " + s);
-                            } else if (c1 == "n") {
+                                break;
+                            case "n" when c1 == "n":
                                 alias = alias.Replace(str, "m" + " " + s);
-                            } else if (c1 == "ng" || c1 == "m") {
+                                break;
+                            case "ng" when c1 == "ng" || c1 == "m":
                                 alias = alias.Replace(str, "n" + " " + s);
-                            } else if (c1 == "sh" || c1 == "zh" || c1 == "th" || c1 == "z" || c1 == "f") {
+                                break;
+                            case "sh" when c1 == "sh" || c1 == "zh" || c1 == "th" || c1 == "z" || c1 == "f":
                                 alias = alias.Replace(str, "s" + " " + s);
-                            } else if (c1 == "k") {
+                                break;
+                            case "k" when c1 == "k":
                                 alias = alias.Replace(str, "t" + " " + s);
-                            } else if (c1 == "s") {
+                                break;
+                            case "s" when c1 == "s":
                                 alias = alias.Replace(str, "z" + " " + s);
-                            } else if (c1 == "hh") {
+                                break;
+                            case "hh" when c1 == "hh":
                                 alias = alias.Replace(str, null);
-                            }
-                            break;
+                                break;
+                        }
                     }
                 }
             }
             // CC's
             foreach (var c1 in new[] { "f", "z", "hh", "k", "p", "d", "dh", "g", "b", "m", "r" }) {
                 foreach (var c2 in consonants) {
-                    switch (c1 + " " + c2) {
-                        case var str when alias.Contains(str):
-                            if (ccSpecific) {
-                                if (c1 == "f" || c1 == "z") {
+                    var str = c1 + " " + c2;
+                    if (alias.Contains(str)) {
+                        if (ccSpecific) {
+                            switch (c1) {
+                                case "f" when c1 == "f" || c1 == "z":
                                     alias = alias.Replace(str, "s" + " " + c2);
-                                } else if (c1 == "k" || c1 == "p" || c1 == "d") {
+                                    break;
+                                case "k" when c1 == "k" || c1 == "p" || c1 == "d":
                                     alias = alias.Replace(str, "t" + " " + c2);
-                                } else if (c1 == "dh" || c1 == "g" || c1 == "b") {
+                                    break;
+                                case "dh" when c1 == "dh" || c1 == "g" || c1 == "b":
                                     alias = alias.Replace(str, "d" + " " + c2);
-                                } else if (c1 == "m") {
+                                    break;
+                                case "m" when c1 == "m":
                                     alias = alias.Replace(str, "n" + " " + c2);
-                                } else if (c1 == "hh") {
+                                    break;
+                                case "hh" when c1 == "hh":
                                     alias = alias.Replace(str, "f" + " " + c2);
-                                } else if (c1 == "r") {
+                                    break;
+                                case "r" when c1 == "r":
                                     alias = alias.Replace(str, "er" + " " + c2);
-                                }
+                                    break;
                             }
-                            break;
+                        }
                     }
                 }
             }
