@@ -53,7 +53,7 @@ namespace OpenUtau.Plugin.Builtin {
         private bool isMissingVPhonemes = false;
 
         // For banks with missing custom consonants
-        private readonly Dictionary<string, string> missingCphonemes = "nx=n,cl=q,vf=q,wh=w,dx=d,zh=sh,z=s".Split(',')
+        private readonly Dictionary<string, string> missingCphonemes = "nx=n,cl=q,vf=q,wh=w,dx=d,zh=sh,z=s,ng=n".Split(',')
                 .Select(entry => entry.Split('='))
                 .Where(parts => parts.Length == 2)
                 .Where(parts => parts[0] != parts[1])
@@ -344,7 +344,7 @@ namespace OpenUtau.Plugin.Builtin {
                             basePhoneme = ccv1;
                         }
                         break;
-                    } else if (syllable.CurrentWordCc.Length >= 1 && syllable.PreviousWordCc.Length == 1) {
+                    } else if (syllable.CurrentWordCc.Length == 1 && syllable.PreviousWordCc.Length == 1) {
                         basePhoneme = crv;
                     }
                 }
@@ -357,7 +357,7 @@ namespace OpenUtau.Plugin.Builtin {
                         phonemes.Add(vr);
                         phonemes.Add($"- {cc[0]}");
                         break;
-                    } else if (cc.Length > 2 && HasOto(vcc, syllable.tone) || HasOto(ValidateAlias(vcc), syllable.tone)) {
+                    } else if (syllable.IsStartingCVWithMoreThanOneConsonant && syllable.CurrentWordCc.Length >= 2 && HasOto(vcc, syllable.tone) || HasOto(ValidateAlias(vcc), syllable.tone)) {
                         phonemes.Add(vcc);
                         firstC = 1;
                         break;
@@ -394,7 +394,7 @@ namespace OpenUtau.Plugin.Builtin {
                     cc1 = ValidateAlias(cc1);
                 }
                 // CC V on multiple consonants ex [s tr ao] (only if the word starts with a CC)
-                if (syllable.CurrentWordCc.Length >= 2 && syllable.PreviousWordCc.Length >= 1) {
+                if (syllable.CurrentWordCc.Length >= 2) {
                     if (HasOto(ccv, syllable.vowelTone) || HasOto(ValidateAlias(ccv), syllable.vowelTone)) {
                         basePhoneme = ccv;
                         lastC = i;
@@ -407,7 +407,7 @@ namespace OpenUtau.Plugin.Builtin {
                     if (HasOto($"{cc[i]} {string.Join("", cc.Skip(i + 1))}", syllable.tone)) {
                         cc1 = $"{cc[i]} {string.Join("", cc.Skip(i + 1))}";
                     }
-                } else if (syllable.CurrentWordCc.Length >= 1 && syllable.PreviousWordCc.Length == 1) {
+                } else if (syllable.CurrentWordCc.Length == 1 && syllable.PreviousWordCc.Length == 1) {
                     basePhoneme = lcv;
                     // [C1 C2]
                     if (!HasOto(cc1, syllable.tone)) {
@@ -435,7 +435,7 @@ namespace OpenUtau.Plugin.Builtin {
                         cc1 = ValidateAlias(cc1);
                     }
                     // CC V on multiple consonants ex [s tr ao] (only if the word starts with a CC)
-                    if (syllable.CurrentWordCc.Length >= 2 && syllable.PreviousWordCc.Length >= 1) {
+                    if (syllable.CurrentWordCc.Length >= 2) {
                         if (HasOto(ccv, syllable.vowelTone) || HasOto(ValidateAlias(ccv), syllable.vowelTone)) {
                             basePhoneme = ccv;
                             lastC = i;
@@ -448,7 +448,7 @@ namespace OpenUtau.Plugin.Builtin {
                         if (HasOto($"{cc[i]} {string.Join("", cc.Skip(i + 1))}", syllable.tone)) {
                             cc1 = $"{cc[i]} {string.Join("", cc.Skip(i + 1))}";
                         }
-                    } else if (syllable.CurrentWordCc.Length >= 1 && syllable.PreviousWordCc.Length == 1) {
+                    } else if (syllable.CurrentWordCc.Length == 1 && syllable.PreviousWordCc.Length == 1) {
                         basePhoneme = lcv;
                         // [C1 C2]
                         if (!HasOto(cc1, syllable.tone)) {
@@ -648,9 +648,7 @@ namespace OpenUtau.Plugin.Builtin {
         protected override string ValidateAlias(string alias) {
             //FALLBACKS
             //CV (IF CV HAS NO C AND V FALLBACK)
-            if (alias == "ng ae") {
-                return alias.Replace("ng", "n");
-            } else if (alias == "ng ao") {
+            if (alias == "ng ao") {
                 return alias.Replace("ao", "ow");
             } else if (alias == "ch ao") {
                 return alias.Replace("ch ao", "sh ow");
@@ -758,7 +756,7 @@ namespace OpenUtau.Plugin.Builtin {
                     alias = alias.Replace(syllable.Key, syllable.Value);
                 }
             }
-            var replacements = new Dictionary<string, string[]> {
+            var CVMappings = new Dictionary<string, string[]> {
                     { "ao", new[] { "ow" } },
                     { "ax", new[] { "ah" } },
                     { "oy", new[] { "ow" } },
@@ -769,7 +767,7 @@ namespace OpenUtau.Plugin.Builtin {
                     { "ow", new[] { "ao" } },
                     { "uh", new[] { "uw" } },
             };
-            foreach (var kvp in replacements) {
+            foreach (var kvp in CVMappings) {
                 var v1 = kvp.Key;
                 var vfallbacks = kvp.Value;
                 foreach (var vfallback in vfallbacks) {
@@ -778,6 +776,7 @@ namespace OpenUtau.Plugin.Builtin {
                     }
                 }
             }
+
             Dictionary<string, List<string>> vvReplacements = new Dictionary<string, List<string>>
             {
             //VV (diphthongs) some
@@ -1688,14 +1687,17 @@ namespace OpenUtau.Plugin.Builtin {
                     var str = c1 + " " + s;
                     if (alias.Contains(str)) {
                         switch (c1) {
+                            case "b" when c1 == "b":
+                                alias = alias.Replace(str, "d" + " " + s);
+                                break;
                             case "d" when c1 == "d" || c1 == "dh" || c1 == "g" || c1 == "p":
                                 alias = alias.Replace(str, "b" + " " + s);
                                 break;
+                            case "ch" when c1 == "ch":
+                                alias = alias.Replace(str, "jh" + " " + s);
+                                break;
                             case "jh" when c1 == "jh":
                                 alias = alias.Replace(str, "ch" + " " + s);
-                                break;
-                            case "b" when c1 == "b":
-                                alias = alias.Replace(str, "d" + " " + s);
                                 break;
                             case "s" when c1 == "s":
                                 alias = alias.Replace(str, "f" + " " + s);
