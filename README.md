@@ -21,6 +21,8 @@ As of version **`V0.0.55`** and above, it now supports the majority of all ARPAs
 ## How to download and install the custom Phonemizer
 
 - To download and install the Phonemizer, click on Releases then click the dll file to download. When downloaded, move ArpaPlusPhonemizer.dll into the path\to\OpenUtau\Plugins folder or just simply drag the dll file and drop onto the OpenUtau program.
+##### image by Astel for visual representation
+![MRBEAST](https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/assets/92255161/cdc8fe64-6caa-4140-a60e-56bd263bfe6d)
  - - - -
  ## Supported Consonants and Vowels
  - **Consonants are automatically supported by this phonemizer but if the consonants aren't listed on the `GetTransitionBasicLengthMs`, their lengths are defaulted to 1.0 ms**
