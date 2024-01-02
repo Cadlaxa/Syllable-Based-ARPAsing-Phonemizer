@@ -1,3 +1,7 @@
+[![Download](https://custom-icon-badges.demolab.com/badge/-Download-blue?style=for-the-badge&logo=download&logoColor=white "Download")](https://github.com/Cadlaxa/Syllable-Based-ARPAsing-Phonemizer/releases/latest/download/ArpaPlusPhonemizer.dll)
+
+**When downloaded, move ArpaPlusPhonemizer.dll into the path\to\OpenUtau\Plugins folder or just simply drag the dll file and drop onto the OpenUtau program.**
+
 # Syllable-Based ARPAsing Phonemizer (ARPAsing plus Phonemizer)
 Custom English Arpabet Phonemizer based on Syllable-Based API Phonemizer
  
