@@ -31,7 +31,7 @@ As of version **`V0.0.55`** and above, it now supports the majority of all ARPAs
 `aar`, `ar`, `axr`, `aer`, `ahr`, `aor`, `or`, `awr`, `aur`, `ayr`, `air`, `ehr`, `eyr`, `eir`, `ihr`, `iyr`, `ir`, `owr`, `our`, `oyr`, `oir`, `uhr`, `uwr`, `ur`,
 `aal`, `al`, `axl`, `ael`, `ahl`, `aol`, `ol`, `awl`, `aul`, `ayl`, `ail`, `ehl`, `el`, `eyl`, `eil`, `ihl`, `iyl`, `il`, `owl`, `oul`, `oyl`, `oil`, `uhl`, `uwl`, `ul`,
 `naan`, `an`, `axn`, `aen`, `ahn`, `aon`, `on`, `awn`, `aun`, `ayn`, `ain`, `ehn`, `en`, `eyn`, `ein`, `ihn`, `iyn`, `in`, `own`, `oun`, `oyn`, `oin`, `uhn`, `uwn`, `un`,
-`aang`, `ang`, `axng`, `aeng`, `ahng`, `aong`, `ong`, `awng`, `aung`, `ayng`, `aing`, `ehng`, `eng`, `eyng`, `eing`, `ihng`, `iyng`, `ing`, `owng`, `oung`, `oyng`, `oing`, `uhng`, `uwng`, `ung`, `aam`, `am`, `axm`, `aem`, `ahm`, `aom`, `om`, `awm`, `aum`, `aym`, `aim`, `ehm`, `em`, `eym`, `eim`, `ihm`, `iym`, `im`, `owm`, `oum`, `oym`, `oim`, `uhm`, `uwm`, `um`, `oh`, `eu`, `oe`, `yw`, `yx`, `wx`**
+`aang`, `ang`, `axng`, `aeng`, `ahng`, `aong`, `ong`, `awng`, `aung`, `ayng`, `aing`, `ehng`, `eng`, `eyng`, `eing`, `ihng`, `iyng`, `ing`, `owng`, `oung`, `oyng`, `oing`, `uhng`, `uwng`, `ung`, `aam`, `am`, `axm`, `aem`, `ahm`, `aom`, `om`, `awm`, `aum`, `aym`, `aim`, `ehm`, `em`, `eym`, `eim`, `ihm`, `iym`, `im`, `owm`, `oum`, `oym`, `oim`, `uhm`, `uwm`, `um`, `oh`, `eu`, `oe`, `yw`, `yx`, `wx`, `ox`, `ex`**
     - **📍 note: if the custom vowels are not here on the list or in the code, they will be recognized as consonants, Syllable-based Phonemizers will have to define all possible vowels in order to them to be recognized as a Vowel**
  - - - -
  ## Mechanics of the Phonemizer
