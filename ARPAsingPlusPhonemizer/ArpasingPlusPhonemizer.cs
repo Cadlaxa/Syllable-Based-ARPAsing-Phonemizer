@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
+using NAudio.Flac.Metadata;
 using OpenUtau.Api;
 using OpenUtau.Core.G2p;
 using Serilog;
@@ -361,7 +363,7 @@ namespace OpenUtau.Plugin.Builtin {
                     var vcc = $"{prevV} {string.Join("", cc.Take(2))}";
                     var vc = $"{prevV} {cc[0]}";
                     // CCV will trigger VCC
-                    bool CCV = false; 
+                    bool CCV = false;
                     if (syllable.CurrentWordCc.Length >= 2 && !ccvException.Contains(cc[0])) {
                         if (HasOto($"{string.Join("", cc)} {v}", syllable.vowelTone) || HasOto(ValidateAlias($"{string.Join("", cc)} {v}"), syllable.vowelTone)) {
                             CCV = true;
@@ -371,21 +373,14 @@ namespace OpenUtau.Plugin.Builtin {
                         phonemes.Add(vr);
                         phonemes.Add($"- {cc[0]}");
                         break;
-                    } else if (CCV) {
-                        if (!(ccvException.Contains(cc[0]) && (HasOto(vcc, syllable.tone) || HasOto(ValidateAlias(vcc), syllable.tone)))) {
-                            phonemes.Add(vcc);
-                            firstC = 1;
-                            break;
-                        }
-                    //} else if (vc_cAcception.Contains(cc[0]) && syllable.PreviousWordCc.Length >= 2 && HasOto(vc_c, syllable.tone) && !HasOto($"{prevV}{string.Join(" ", cc.Take(1))}", syllable.tone) || HasOto(ValidateAlias(vc_c), syllable.tone)) {
-                     //   phonemes.Add(vc_c);
-                    //    firstC = 1;
+                    } else if ((HasOto(vcc, syllable.tone) || HasOto(ValidateAlias(vcc), syllable.tone)) && CCV && !affricates.Contains(string.Join("", cc.Take(2)))) {
+                        phonemes.Add(vcc);
+                        firstC = 1;
                         break;
                     } else if (HasOto(vc, syllable.tone) || HasOto(ValidateAlias(vc), syllable.tone)) {
                         phonemes.Add(vc);
                         break;
                     } else {
-                        // If none of the conditions are met, continue the loop
                         continue;
                     }
                 }
