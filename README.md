@@ -2,6 +2,8 @@
 
 **When downloaded, move ArpaPlusPhonemizer.dll into the path\to\OpenUtau\Plugins folder or just simply drag the dll file and drop onto the OpenUtau program.**
 
+### **`As of OpenUtau v0.1.421.0 (beta), Arpasing+ Phonemizer has been merged to main and everyone who has the dll file of the external phonemizer can now delete it to avoid duplication of the phonemizer.`**
+
 # Syllable-Based ARPAsing Phonemizer (ARPAsing plus Phonemizer)
 Custom English Arpabet Phonemizer based on Syllable-Based API Phonemizer
  
